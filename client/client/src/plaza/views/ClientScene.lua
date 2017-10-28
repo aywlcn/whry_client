@@ -91,10 +91,13 @@ ClientScene.BT_TASK			= 12
 ClientScene.BT_RANK			= 13
 ClientScene.BT_QUICKSTART	= 14
 ClientScene.BT_EXCHANGE		= 15
+
 ClientScene.BT_BOX			= 16
 ClientScene.BT_CHECKIN		= 17
 ClientScene.BT_TRUMPET		= 18
 ClientScene.BT_PERSON		= 19
+ClientScene.BT_BEAN_EXCHANGE	= 20
+
 
 local HELP_LAYER_NAME = "__introduce_help_layer__"
 local HELP_BTN_NAME = "__introduce_help_button__"
@@ -118,9 +121,11 @@ function ClientScene:onEnterTransitionFinish()
 	--裁切头像
 	local head = HeadSprite:createClipHead(GlobalUserItem, 70)
 	if nil ~= head then
-		head:setPosition(self._btExit:getPosition())
+		head:setPosition(self._headBg:getPosition())
+		--self._AreaTop:addChild(head)
 		self._AreaTop:addChild(head)
-		self._head = head
+        
+        self._head = head
 
 		local frameFile = nil
 		local scaleRate = nil
@@ -280,7 +285,11 @@ function ClientScene:onCreate()
 
 	--顶部区域
 	local areaTop = csbNode:getChildByName("top_bg")
+    
 	self._AreaTop = areaTop
+    -- add by wss 
+    self._AreaTop:setPositionY(display.height)
+
 	--设置
 	self._btConfig = areaTop:getChildByName("btn_set")
 	self._btConfig:setTag(ClientScene.BT_CONFIG)
@@ -290,6 +299,8 @@ function ClientScene:onCreate()
 	self._btExit = areaTop:getChildByName("btn_return")
 	self._btExit:setTag(ClientScene.BT_EXIT)
 	self._btExit:addTouchEventListener(btcallback)
+
+    
 
 	--查看信息
 	self._btPersonInfo = areaTop:getChildByName("bt_person")
@@ -307,17 +318,18 @@ function ClientScene:onCreate()
 	--金币
 	self._gold = getChildFormObject(areaTop , "atlas_coin")  -- areaTop:getChildByName("atlas_coin")
     local btn = getChildFormObject(areaTop , "btn_take")  -- areaTop:getChildByName("btn_take")
-    btn:setTag(ClientScene.BT_BANK)
+    btn:setTag(ClientScene.BT_EXCHANGE)   --btn:setTag(ClientScene.BT_BANK)
     btn:addTouchEventListener(btcallback)
 
-	--游戏豆
+	--游戏豆, 钻石
 	self._bean = getChildFormObject(areaTop , "atlas_bean") --areaTop:getChildByName("atlas_bean")
 	btn = getChildFormObject(areaTop , "btn_charge") -- areaTop:getChildByName("btn_charge")
-    btn:setTag(ClientScene.BT_EXCHANGE)
-    btn:addTouchEventListener(btcallback)
+    btn:setTag(ClientScene.BT_BEAN_EXCHANGE)
+    --btn:addTouchEventListener(btcallback)
     local box = ExternalFun.loadCSB("plaza/ChargeAni.csb", areaTop)
 	box:setPosition(btn:getPosition())
     self.m_btnCharge = box
+    self.m_btnCharge:setVisible(false)
 
 	--元宝
 	self._ingot = getChildFormObject(areaTop , "atlas_ingot") -- areaTop:getChildByName("atlas_ingot")
@@ -328,14 +340,60 @@ function ClientScene:onCreate()
     --宝箱
     self.m_btnBox = getChildFormObject(areaTop , "btn_box")  -- areaTop:getChildByName("btn_box")
     self.m_btnBox:setTag(ClientScene.BT_BOX)
-    self.m_btnBox:addTouchEventListener(btcallback)
+    --self.m_btnBox:addTouchEventListener(btcallback)
 	local box = ExternalFun.loadCSB("plaza/BoxAni.csb", areaTop)
 	box:setPosition(self.m_btnBox:getPosition())
 	self._btBox = box
+    -- add by wss 
+    self._btBox:setPositionX(-1000)
 
 	--底部区域
 	local areaBottom = csbNode:getChildByName("bottom_bg")
     self._AreaBottom = areaBottom
+
+    -- 头像bg
+    self._headBg = areaTop:getChildByName("headBg")
+    self._headBg:setVisible(false)
+
+    -- 头像
+    self._headImg = self._headBg:getChildByName("headImg")
+
+    -- show girl
+    self._showGirl = csbNode:getChildByName("showGirl")
+
+    -- 精彩活动
+    self._activity = csbNode:getChildByName("activityBtn")
+
+    -- 昵称
+    self._nickName = getChildFormObject(csbNode , "nickname")  
+    self._nickName:setString( GlobalUserItem.szNickName )
+
+    -- ID
+    self._playerId = getChildFormObject(csbNode , "ID_value")
+    self._playerId:setString( GlobalUserItem.dwGameID )
+
+    -- 游戏列表容器
+    self._gameListPanel = getChildFormObject(csbNode , "gameListPanel")
+
+    -- 游戏列表的尺寸
+    GlobalUserItem.gameListRect = cc.rect(self._gameListPanel:getPositionX() , self._gameListPanel:getPositionY() , self._gameListPanel:getContentSize().width , self._gameListPanel:getContentSize().height )
+
+    -- 等级进度条
+    self._prossBarBg = getChildFormObject(csbNode , "sp_progress_bg_5") 
+    self._prossBarBg:setVisible(false)
+    self._prossBar =  getChildFormObject(csbNode , "bar_progress") 
+    self._prossBar:setVisible(false)
+
+    -- 保险箱设置调用函数
+    self._safeboxBtn = getChildFormObject(csbNode , "safeBox") 
+    self._safeboxBtn:setTag(ClientScene.BT_BANK) -- self._safeboxBtn:setTag(ClientScene.BT_EXCHANGE)
+    self._safeboxBtn:addTouchEventListener(btcallback)
+
+    -- 游戏列表的左右两个按钮
+    self._leftScrollBtn = getChildFormObject(csbNode , "leftScrollBtn") 
+    self._rightScrollBtn = getChildFormObject(csbNode , "rightScrollBtn") 
+
+
 
 	--快速开始
 	btn = getChildFormObject(areaBottom , "image_start") -- areaBottom:getChildByName("image_start")
@@ -1090,7 +1148,10 @@ function ClientScene:onButtonClickedEvent(tag,ref)
 		elseif tag == ClientScene.BT_RECHARGE then
 			self:onChangeShowMode(yl.SCENE_SHOP, Shop.CBT_ENTITY)
 		elseif tag == ClientScene.BT_EXCHANGE then
-			self:onChangeShowMode(yl.SCENE_SHOP, Shop.CBT_BEAN)
+			--self:onChangeShowMode(yl.SCENE_SHOP, Shop.CBT_BEAN)
+            self:onChangeShowMode(yl.SCENE_SHOP, Shop.CBT_SCORE)
+        elseif tag == ClientScene.BT_BEAN_EXCHANGE then
+            self:onChangeShowMode(yl.SCENE_SHOP, Shop.CBT_BEAN)
 		elseif tag == ClientScene.BT_BOX then
 			self:onChangeShowMode(yl.SCENE_EVERYDAY)
 		elseif tag == ClientScene.BT_BAG then
@@ -1315,22 +1376,41 @@ function ClientScene:onChangeShowMode(nTag, param)
 	self._AreaBottom:stopAllActions()
 	self._AreaTop:stopAllActions()
 	if tag == yl.SCENE_GAMELIST or tag == yl.SCENE_ROOMLIST  or tag == yl.SCENE_ROOM then
-		self._AreaTop:runAction(cc.MoveTo:create(0.3,cc.p(667,732)))
+		self._AreaTop:runAction(cc.MoveTo:create(0.3,cc.p(667,display.height)))
 		self._AreaBottom:runAction(cc.MoveTo:create(0.3,cc.p(667,0)))
+
+        -- add by wss 从其他页面回来
+        self._showGirl:runAction(cc.FadeIn:create(0.2))
+        self._activity:runAction(cc.FadeIn:create(0.2))
+        self._leftScrollBtn:runAction(cc.FadeIn:create(0.2))
+        self._rightScrollBtn:runAction(cc.FadeIn:create(0.2))
+
 	else
 		if PriRoom and PriRoom.haveBottomTop(tag) then
 			if self._AreaBottom:getPositionY() < 0 then
-				self._AreaTop:runAction(cc.MoveTo:create(0.3,cc.p(667,732)))
+				self._AreaTop:runAction(cc.MoveTo:create(0.3,cc.p(667,display.height)))
 				self._AreaBottom:runAction(cc.MoveTo:create(0.3,cc.p(667,0)))
 			end
+            -- add by wss 从其他页面回来
+            self._showGirl:runAction(cc.FadeIn:create(0.2))
+            self._activity:runAction(cc.FadeIn:create(0.2))
+            self._leftScrollBtn:runAction(cc.FadeIn:create(0.2))
+            self._rightScrollBtn:runAction(cc.FadeIn:create(0.2))
+
 		else
 			if tag == yl.SCENE_GAME then
 				self._AreaBottom:setPosition(cc.p(667,-170))
 				self._AreaTop:setPosition(cc.p(667,845))
 			else
 				self._AreaBottom:runAction(cc.MoveTo:create(0.3,cc.p(667,-170)))
-				self._AreaTop:runAction(cc.MoveTo:create(0.3,cc.p(667,845)))
+				self._AreaTop:runAction(cc.MoveTo:create(0.3,cc.p(667, display.height + (845 - 732) )))
 			end
+            -- add by wss 进入其他页面
+            self._showGirl:runAction(cc.FadeOut:create(0.2))
+            self._activity:runAction(cc.FadeOut:create(0.2))
+            self._leftScrollBtn:runAction(cc.FadeOut:create(0.2))
+            self._rightScrollBtn:runAction(cc.FadeOut:create(0.2))
+
 		end				
 	end
 	local bRoomList = true

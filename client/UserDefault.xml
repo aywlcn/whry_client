@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <userDefaultRoot>
     <extra_command_version>2</extra_command_version>
-    <303everyDayCheck>1508766413</303everyDayCheck>
+    <303everyDayCheck>1509188357</303everyDayCheck>
     <303everyDayNoAdNotice>nil</303everyDayNoAdNotice>
     <303everyDayTable>1507556015</303everyDayTable>
     <vocieable>false</vocieable>
     <5050everyDayCheck>1508240410</5050everyDayCheck>
     <recordpermissionreq>true</recordpermissionreq>
+    <autologon>true</autologon>
+    <307everyDayCheck>1509207724</307everyDayCheck>
 </userDefaultRoot>

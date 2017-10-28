@@ -26,6 +26,37 @@ function GameListLayer:ctor(gamelist)
 
 	local this = self
 
+    --注册node事件
+    --ExternalFun.registerTouchEvent(self, true)
+
+    local function onTouchBegan( touch, event )
+        if nil == self.onTouchBegan then
+            return false
+        end
+        return self:onTouchBegan(touch, event)
+    end
+
+    local function onTouchMoved(touch, event)
+        if nil ~= self.onTouchMoved then
+            self:onTouchMoved(touch, event)
+        end
+    end
+
+    local function onTouchEnded( touch, event )
+        if nil ~= self.onTouchEnded then
+            self:onTouchEnded(touch, event)
+        end       
+    end
+
+    local listener = cc.EventListenerTouchOneByOne:create()
+	listener:setSwallowTouches(false)
+	self._listener = listener
+	listener:registerScriptHandler( handler(self, self.onTouchBegan ),cc.Handler.EVENT_TOUCH_BEGAN )
+	listener:registerScriptHandler(handler(self, self.onTouchMoved ) ,cc.Handler.EVENT_TOUCH_MOVED )
+	listener:registerScriptHandler(handler(self, self.onTouchEnded ) ,cc.Handler.EVENT_TOUCH_ENDED )
+	local eventDispatcher = self:getEventDispatcher()
+	eventDispatcher:addEventListenerWithSceneGraphPriority(listener, self)
+
 	self:setContentSize(yl.WIDTH,yl.HEIGHT)
 
 	self._gameList = gamelist
@@ -36,6 +67,7 @@ function GameListLayer:ctor(gamelist)
 
 	self._logonFrame = LogonFrame:create(self,logonCallBack)
 	
+    
 
 	self:registerScriptHandler(function(eventType)
 		if eventType == "enterTransitionFinish" then	-- 进入场景而且过渡动画结束时候触发。
@@ -49,16 +81,25 @@ function GameListLayer:ctor(gamelist)
 		end
 	end)
 
+    self._listViewSize = cc.size( GlobalUserItem.gameListRect.width , GlobalUserItem.gameListRect.height )
+    self._listViewPos = cc.p( GlobalUserItem.gameListRect.x , GlobalUserItem.gameListRect.y )
+
+    -- 每隔cell的大小
+    self._cellSize = cc.size(220,220)
+
+    -- 每隔cell 的横间隔
+    self._cellHSpace = (self._listViewSize.width - self._cellSize.width * 3) / 2
+
 	--游戏列表
-	self._listView = cc.TableView:create(cc.size(yl.WIDTH, 420))
+	self._listView = cc.TableView:create( self._listViewSize )  -- (cc.size(yl.WIDTH, 420)) 
 	self._listView:setDirection(cc.SCROLLVIEW_DIRECTION_HORIZONTAL)    
-	self._listView:setPosition(cc.p(0,160))
+	self._listView:setPosition (self._listViewPos)  -- (cc.p(0,160))  
 	self._listView:setDelegate()
 	self._listView:addTo(self)
-	self._listView:registerScriptHandler(self.tableCellTouched, cc.TABLECELL_TOUCHED)
-	self._listView:registerScriptHandler(self.cellSizeForTable, cc.TABLECELL_SIZE_FOR_INDEX)
-	self._listView:registerScriptHandler(self.tableCellAtIndex, cc.TABLECELL_SIZE_AT_INDEX)
-	self._listView:registerScriptHandler(self.numberOfCellsInTableView, cc.NUMBER_OF_CELLS_IN_TABLEVIEW)
+	self._listView:registerScriptHandler(self.tableCellTouched, cc.TABLECELL_TOUCHED)                    -- 每行的点击事件
+	self._listView:registerScriptHandler(self.cellSizeForTable, cc.TABLECELL_SIZE_FOR_INDEX)             -- 设置tableview的Cell大小
+	self._listView:registerScriptHandler(self.tableCellAtIndex, cc.TABLECELL_SIZE_AT_INDEX)              -- //cell中的元素显示，即每行中要显示的元素都是在这个函数中完成载入的 
+	self._listView:registerScriptHandler(self.numberOfCellsInTableView, cc.NUMBER_OF_CELLS_IN_TABLEVIEW) -- //设置tableview中cell的个数
 	self._listView:registerScriptHandler(self.cellHightLight, cc.TABLECELL_HIGH_LIGHT)
 	self._listView:registerScriptHandler(self.cellUnHightLight, cc.TABLECELL_UNHIGH_LIGHT)
 
@@ -76,6 +117,15 @@ function GameListLayer:ctor(gamelist)
     self.m_labDownloadTip = nil
     self.m_spDownloadCycle = nil
     self.m_bGameUpdate = false
+
+    -- 开始点击的游戏列表的ID
+    self._startTouchBeginGameListId = 0
+
+    -- 去消点击的距离
+    self._touchBeginPos = cc.p(0,0)
+    self._touchEndPos = cc.p(0,0)
+    self._touchCancelDis = 15
+
 end
 
 --获取父场景节点(ClientScene)
@@ -124,7 +174,7 @@ end
 
 --子视图大小
 function GameListLayer.cellSizeForTable(view, idx)
-  	return view:getParent().m_fThird , 360
+  	return view:getParent()._cellSize.width + view:getParent()._cellHSpace/2 ,view:getParent()._cellSize.height * 2  -- view:getParent().m_fThird , 360  --
 end
 
 --子视图数目
@@ -132,127 +182,341 @@ function GameListLayer.numberOfCellsInTableView(view)
 	if not view:getParent()._gameList then
 		return 0
 	else
-  		return #view:getParent()._gameList
+  		return math.floor(#view:getParent()._gameList / 2 )
   	end
 end
 
 --子视图点击
 function GameListLayer.tableCellTouched(view, cell)
-	if GlobalUserItem.isAngentAccount() then
-		return
-	end
-		
-	local index = cell:getIdx() 
-	local gamelistLayer = view:getParent()
+--	if GlobalUserItem.isAngentAccount() then
+--		return
+--	end
 
-	--获取游戏信息
-	local gameinfo = gamelistLayer._gameList[index+1]
-	if  not gameinfo then
-		showToast(gamelistLayer:getParent():getParent(),"未找到游戏信息！",2)
-		return
-	end
-	gameinfo.gameIndex = index
+--	local index = cell:getIdx() 
+--	local gamelistLayer = view:getParent()
 
-	--下载/更新资源 clientscene:getApp
-	local app = gamelistLayer:getParent():getParent():getApp()
-	local version = tonumber(app:getVersionMgr():getResVersion(gameinfo._KindID))
-	if not version or gameinfo._ServerResVersion > version then
-		gamelistLayer:updateGame(gameinfo, index)
-	else
-		gamelistLayer:onEnterGame(gameinfo, false)
-	end
+--	--获取游戏信息
+--	local gameinfo = gamelistLayer._gameList[index+1]
+--	if  not gameinfo then
+--		showToast(gamelistLayer:getParent():getParent(),"未找到游戏信息！",2)
+--		return
+--	end
+--	gameinfo.gameIndex = index
+
+--	--下载/更新资源 clientscene:getApp
+--	local app = gamelistLayer:getParent():getParent():getApp()
+--	local version = tonumber(app:getVersionMgr():getResVersion(gameinfo._KindID))
+--	if not version or gameinfo._ServerResVersion > version then
+--		gamelistLayer:updateGame(gameinfo, index)
+--	else
+--		gamelistLayer:onEnterGame(gameinfo, false)
+--	end
 end
 	
 --获取子视图
 function GameListLayer.tableCellAtIndex(view, idx)	
+    -- 获得一个可用的cell
 	local cell = view:dequeueCell()
 	
-	local gameinfo = view:getParent()._gameList[idx+1]
-	gameinfo.gameIndex = idx
-	local filestr = "GameList/game_"..gameinfo._KindID..".png"
-	if false == cc.FileUtils:getInstance():isFileExist(filestr) then
-		filestr = "GameList/default.png"
-	end
-	local game = nil
-	local mask = nil
-	local spTip = nil
-	local cellpos = cc.p(view:getParent().m_fThird * 0.5,view:getViewSize().height * 0.5)
-	if not cell then
-		cell = cc.TableViewCell:new()
-		game = display.newSprite(filestr)
-		game:addTo(cell)
-			:setAnchorPoint(cc.p(0.5, 0))
-			:setPosition(view:getParent().m_fThird * 0.5, 0)
-			:setTag(1)
+    ------ 创建一列的上下两行
+    local realGmaeListIndex1 = idx * 2 + 0
+    local realGmaeListIndex2 = idx * 2 + 1
 
-		local maskSp = cc.Sprite:create(filestr)
-		local pos = cc.p(0,0)
-		if nil ~= maskSp then			
-			maskSp:setColor(cc.BLACK)
-			maskSp:setOpacity(100)
-			local size = maskSp:getContentSize()
-			--maskSp:setAnchorPoint(cc.p(0, 0))
-			maskSp:setPosition(cc.p(size.width * 0.5,size.height * 0.5))
-			maskSp:setName("download_mask_sp")			
+    local realHPosHeight1 = view:getParent()._cellSize.height
+    local realHPosHeight2 = 0
+    
 
-			mask = ccui.Layout:create()
-			mask:setClippingEnabled(true)
-			mask:setAnchorPoint(cc.p(0.5,0))
-			mask:setPosition(cc.p(view:getParent().m_fThird * 0.5, 0))
-			mask:setContentSize(size)
-			mask:addChild(maskSp)
-			cell:addChild(mask)
-			mask:setName("download_mask")
 
-			spTip = cc.Label:createWithTTF("", "fonts/round_body.ttf", 32)
-				:enableOutline(cc.c4b(0,0,0,255), 1)
-				:move(cellpos)
-				:setName("download_mask_tip")
-				:addTo(cell)
 
-			local cycle = cc.Sprite:create("GameList/spinner_circle.png")
-			if nil ~= cycle then
-				cycle:setPosition(cellpos)
-				cycle:setVisible(false)
-				cycle:setScale(1.3)
-				cycle:setName("download_cycle")
-				cell:addChild(cycle)
-			end			
-		end	
-	else
-		game = cell:getChildByTag(1)
-		game:setTexture(filestr)
+        local gameinfo = view:getParent()._gameList[realGmaeListIndex1+1]
+	    gameinfo.gameIndex = realGmaeListIndex1
+	    local filestr = "GameList/game_"..gameinfo._KindID..".png"
+	    if false == cc.FileUtils:getInstance():isFileExist(filestr) then
+		    filestr = "GameList/default2.png"
+	    end
+        -- 2
+        local gameinfo2 = view:getParent()._gameList[realGmaeListIndex2+1]
+        local isHaveEndSecondHSpace = false
+        local filestr2 = "GameList/default2.png"
+        if gameinfo2 then
+            isHaveEndSecondHSpace = true
 
-		mask = cell:getChildByName("download_mask")
-		if nil ~= mask then
-			local sp = mask:getChildByName("download_mask_sp")
-			if nil ~= sp then
-				local size = sp:getContentSize()
-				sp:setTexture(filestr)
-				sp:setPosition(cc.p(size.width * 0.5,size.height * 0.5))
-				mask:setContentSize(size)
-			end
+	        gameinfo2.gameIndex = realGmaeListIndex2
+	        filestr2 = "GameList/game_"..gameinfo2._KindID..".png"
+	        if false == cc.FileUtils:getInstance():isFileExist(filestr2) then
+		        filestr2 = "GameList/default2.png"
+	        end
+        end
 
-			spTip = mask:getChildByName("download_mask_tip")
-			if nil ~= spTip then
-				local size = mask:getContentSize()
-				spTip:setPosition(cellpos)
-			end
-		end
-	end	
+	    local game = nil
+	    local mask = nil
+	    local spTip = nil
+        --- 2
+        local game2 = nil
+	    local mask2 = nil
+	    local spTip2 = nil
 
-	if nil ~= mask then
-		mask:setVisible(not gameinfo._Active)
-	end
+        -- 更新，转圈圈的位置
+	    local cellpos = cc.p( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight1 + view:getParent()._cellSize.height/2 )  -- cc.p(view:getParent().m_fThird * 0.5,view:getViewSize().height * 0.5)
+        -- 2
+        local cellpos2 = cc.p( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight2 + view:getParent()._cellSize.height/2 )
 
-	if nil ~= spTip then
-		spTip:setString("")
-	end
+	    if not cell then
+		    cell = cc.TableViewCell:new()
+		    game = ccui.ImageView:create(filestr)  --display.newSprite(filestr)
+		    game:addTo(cell)
+			    :setAnchorPoint(cc.p(0.5, 0))
+			    :setPosition( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight1 )   -- (view:getParent().m_fThird * 0.5, 0)   --
+			    :setTag(1)
+		    local maskSp = cc.Sprite:create(filestr)
+		    local pos = cc.p(0,0)
+		    if nil ~= maskSp then			
+			    maskSp:setColor(cc.BLACK)
+			    maskSp:setOpacity(100)
+			    local size = maskSp:getContentSize()
+			    --maskSp:setAnchorPoint(cc.p(0, 0))
+			    maskSp:setPosition(cc.p(size.width * 0.5,size.height * 0.5))
+			    maskSp:setName("download_mask_sp")
+
+			    mask = ccui.Layout:create()
+			    mask:setClippingEnabled(true)
+			    mask:setAnchorPoint(cc.p(0.5,0))
+			    mask:setPosition(cc.p( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight1 ))  -- (view:getParent().m_fThird * 0.5, 0)  --
+			    mask:setContentSize(size)
+			    mask:addChild(maskSp)
+			    cell:addChild(mask)
+			    mask:setName("download_mask")
+
+			    spTip = cc.Label:createWithTTF("", "fonts/round_body.ttf", 32)
+				    :enableOutline(cc.c4b(0,0,0,255), 1)
+				    :move(cellpos)
+				    :setName("download_mask_tip")
+				    :addTo(cell)
+
+			    local cycle = cc.Sprite:create("GameList/spinner_circle.png")
+			    if nil ~= cycle then
+				    cycle:setPosition(cellpos)
+				    cycle:setVisible(false)
+				    cycle:setScale(1.3)
+				    cycle:setName("download_cycle")
+				    cell:addChild(cycle)
+			    end			
+		    end	
+
+            -- touch event
+            game:setTouchEnabled(true)
+            game:setSwallowTouches(false)
+            game:addTouchEventListener(function(ref, tType)
+                if tType == ccui.TouchEventType.began then
+                    view:getParent()._startTouchBeginGameListId = realGmaeListIndex1
+
+                    return true
+                elseif tType == ccui.TouchEventType.ended then   
+                    if view:getParent()._startTouchBeginGameListId ~= realGmaeListIndex1 then
+                        return
+                    end
+                    if cc.pGetDistance(  view:getParent()._touchEndPos  ,view:getParent()._touchBeginPos ) > view:getParent()._touchCancelDis then
+                        return
+                    end
+                    print("-=-=-=-=-=-================================ up up up ")
+
+                    if GlobalUserItem.isAngentAccount() then
+		                return
+	                end
+		
+	                local index = cell:getIdx()  * 2 + 0 -- cell:getIdx() 
+	                local gamelistLayer = view:getParent()
+
+	                --获取游戏信息
+	                local gameinfo = gamelistLayer._gameList[index+1]
+	                if  not gameinfo then
+		                showToast(gamelistLayer:getParent():getParent(),"未找到游戏信息！",2)
+		                return
+	                end
+	                gameinfo.gameIndex = index
+
+	                --下载/更新资源 clientscene:getApp
+	                local app = gamelistLayer:getParent():getParent():getApp()
+	                local version = tonumber(app:getVersionMgr():getResVersion(gameinfo._KindID))
+	                if not version or gameinfo._ServerResVersion > version then
+		                gamelistLayer:updateGame(gameinfo, index)
+	                else
+		                gamelistLayer:onEnterGame(gameinfo, false)
+	                end
+
+
+                end
+            end)
+
+            --- 2
+            
+            game2 = ccui.ImageView:create(filestr2) --display.newSprite(filestr2)
+		    game2:addTo(cell)
+			    :setAnchorPoint(cc.p(0.5, 0))
+			    :setPosition( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight2 )   -- (view:getParent().m_fThird * 0.5, 0)   --
+			    :setTag(2)
+
+		    local maskSp2 = cc.Sprite:create(filestr2)
+		    local pos = cc.p(0,0)
+		    if nil ~= maskSp2 then			
+			    maskSp2:setColor(cc.BLACK)
+			    maskSp2:setOpacity(100)
+			    local size = maskSp2:getContentSize()
+			    --maskSp:setAnchorPoint(cc.p(0, 0))
+			    maskSp2:setPosition(cc.p(size.width * 0.5,size.height * 0.5))
+			    maskSp2:setName("download_mask_sp2")
+
+			    mask2 = ccui.Layout:create()
+			    mask2:setClippingEnabled(true)
+			    mask2:setAnchorPoint(cc.p(0.5,0))
+			    mask2:setPosition(cc.p( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight2 ))  -- (view:getParent().m_fThird * 0.5, 0)  --
+			    mask2:setContentSize(size)
+			    mask2:addChild(maskSp2)
+			    cell:addChild(mask2)
+			    mask2:setName("download_mask2")
+
+			    spTip = cc.Label:createWithTTF("", "fonts/round_body.ttf", 32)
+			        :enableOutline(cc.c4b(0,0,0,255), 1)
+			        :move(cellpos2)
+			        :setName("download_mask_tip2")
+			        :addTo(cell)
+
+			    local cycle = cc.Sprite:create("GameList/spinner_circle.png")
+			    if nil ~= cycle then
+			        cycle:setPosition(cellpos2)
+			        cycle:setVisible(false)
+			        cycle:setScale(1.3)
+			        cycle:setName("download_cycle2")
+			        cell:addChild(cycle)
+			    end			
+		    end	
+            
+            -- 2 touch event
+            game2:setTouchEnabled(true)
+            game2:setSwallowTouches(false)
+            game2:addTouchEventListener(function(ref, tType)
+                if tType == ccui.TouchEventType.began then
+                    view:getParent()._startTouchBeginGameListId = realGmaeListIndex2
+
+                    return true
+                elseif tType == ccui.TouchEventType.ended then   
+                    if view:getParent()._startTouchBeginGameListId ~= realGmaeListIndex2 then
+                        return
+                    end
+                    if cc.pGetDistance(  view:getParent()._touchEndPos  ,view:getParent()._touchBeginPos ) > view:getParent()._touchCancelDis then
+                        return
+                    end
+                    print("-=-=-=-=-=-================================ down down down ")
+
+                    if GlobalUserItem.isAngentAccount() then
+		                return
+	                end
+		
+	                local index = cell:getIdx()  * 2 + 1 -- cell:getIdx() 
+	                local gamelistLayer = view:getParent()
+
+	                --获取游戏信息
+	                local gameinfo = gamelistLayer._gameList[index+1]
+	                if  not gameinfo then
+		                showToast(gamelistLayer:getParent():getParent(),"未找到游戏信息！",2)
+		                return
+	                end
+	                gameinfo.gameIndex = index
+
+	                --下载/更新资源 clientscene:getApp
+	                local app = gamelistLayer:getParent():getParent():getApp()
+	                local version = tonumber(app:getVersionMgr():getResVersion(gameinfo._KindID))
+	                if not version or gameinfo._ServerResVersion > version then
+		                gamelistLayer:updateGame(gameinfo, index)
+	                else
+		                gamelistLayer:onEnterGame(gameinfo, false)
+	                end
+
+
+                end
+            end)
+
+
+	    else-----------------------------------------------------------------------------------------------
+		    game = cell:getChildByTag(1)
+            dump(gameinfo,"-=-=-=-=-=-=-------------- gameinfo")
+            print("-=-=-=-=-=-=-=---------------- filestr",filestr)
+            dump(gameinfo2,"-=-=-=-=-=-=-------------- gameinfo2")
+            print("-=-=-=-=-=-=-=---------------- filestr2",filestr2)
+
+		    game:loadTexture(filestr)
+
+		    mask = cell:getChildByName("download_mask")
+		    if nil ~= mask then
+			    local sp = mask:getChildByName("download_mask_sp")
+			    if nil ~= sp then
+				    local size = sp:getContentSize()
+				    sp:setTexture(filestr)
+				    sp:setPosition(cc.p(size.width * 0.5,size.height * 0.5))
+				    mask:setContentSize(size)
+			    end
+
+			    spTip = mask:getChildByName("download_mask_tip")
+			    if nil ~= spTip then
+				    local size = mask:getContentSize()
+				    spTip:setPosition(cellpos)
+			    end
+		    end
+
+            --- 2
+            if isHaveEndSecondHSpace then
+                game2 = cell:getChildByTag(2)
+		        game2:loadTexture (filestr2)
+
+		        mask2 = cell:getChildByName("download_mask2")
+		        if nil ~= mask2 then
+			        local sp = mask2:getChildByName("download_mask_sp2")
+			        if nil ~= sp then
+				        local size = sp:getContentSize()
+				        sp:setTexture(filestr2)
+				        sp:setPosition(cc.p(size.width * 0.5,size.height * 0.5))
+				        mask2:setContentSize(size)
+			        end
+
+			        spTip2 = mask2:getChildByName("download_mask_tip2")
+			        if nil ~= spTip2 then
+				        local size = mask2:getContentSize()
+				        spTip2:setPosition(cellpos2)
+			        end
+		        end
+            end
+	    end	
+
+	    if nil ~= mask then
+		    mask:setVisible(not gameinfo._Active)
+	    end
+
+	    if nil ~= spTip then
+		    spTip:setString("")
+	    end
+
+
 	cell:setVisible(true)
-	cell:setTag(gameinfo._KindID)
+	--cell:setTag(gameinfo._KindID)
 	return cell
 end
 ---------------------------------------------------------------------
+
+function GameListLayer:onTouchBegan(touch, event)
+    print("-=-=-=----------------- touch being")
+    local touchPos = touch:getLocation()
+    self._touchBeginPos = cc.p( touchPos )
+    return true
+end
+
+function GameListLayer:onTouchMoved(touch, event)
+    print("-=-=-=----------------- touch move")
+end
+
+function GameListLayer:onTouchEnded(touch, event)
+    local touchPos = touch:getLocation()
+    self._touchEndPos = cc.p( touchPos )
+end
 
 --链接游戏
 function GameListLayer:onLoadGameList(nKindID)
