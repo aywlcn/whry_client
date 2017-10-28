@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"/>
+
+<plist version="1.0">
+    <dict>
+        <key>res_game_118</key>
+        <real>1.0000000000000000</real>
+        <key>res_game_389</key>
+        <real>1.0000000000000000</real>
+        <key>res_game_200</key>
+        <real>1.0000000000000000</real>
+        <key>res_game_6</key>
+        <real>1.0000000000000000</real>
+        <key>res_client</key>
+        <real>3.0000000000000000</real>
+        <key>res_game_510</key>
+        <real>1.0000000000000000</real>
+        <key>res_game_102</key>
+        <real>1.0000000000000000</real>
+        <key>res_game_511</key>
+        <real>1.0000000000000000</real>
+        <key>res_game_238</key>
+        <real>1.0000000000000000</real>
+    </dict>
+</plist>
