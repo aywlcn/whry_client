@@ -126,6 +126,8 @@ function GameListLayer:ctor(gamelist)
     self._touchEndPos = cc.p(0,0)
     self._touchCancelDis = 15
 
+    self._canTouchInGame = true  -- 可以点进子游戏中
+
 end
 
 --获取父场景节点(ClientScene)
@@ -287,6 +289,8 @@ function GameListLayer.tableCellAtIndex(view, idx)
 			    cell:addChild(mask)
 			    mask:setName("download_mask")
 
+                mask:setVisible(false)
+
 			    spTip = cc.Label:createWithTTF("", "fonts/round_body.ttf", 32)
 				    :enableOutline(cc.c4b(0,0,0,255), 1)
 				    :move(cellpos)
@@ -315,7 +319,7 @@ function GameListLayer.tableCellAtIndex(view, idx)
                     if view:getParent()._startTouchBeginGameListId ~= realGmaeListIndex1 then
                         return
                     end
-                    if cc.pGetDistance(  view:getParent()._touchEndPos  ,view:getParent()._touchBeginPos ) > view:getParent()._touchCancelDis then
+                    if not view:getParent()._canTouchInGame then
                         return
                     end
                     print("-=-=-=-=-=-================================ up up up ")
@@ -339,7 +343,7 @@ function GameListLayer.tableCellAtIndex(view, idx)
 	                local app = gamelistLayer:getParent():getParent():getApp()
 	                local version = tonumber(app:getVersionMgr():getResVersion(gameinfo._KindID))
 	                if not version or gameinfo._ServerResVersion > version then
-		                gamelistLayer:updateGame(gameinfo, index)
+		                gamelistLayer:updateGame(gameinfo, index , 1)
 	                else
 		                gamelistLayer:onEnterGame(gameinfo, false)
 	                end
@@ -375,6 +379,8 @@ function GameListLayer.tableCellAtIndex(view, idx)
 			    cell:addChild(mask2)
 			    mask2:setName("download_mask2")
 
+                mask2:setVisible(false)
+
 			    spTip = cc.Label:createWithTTF("", "fonts/round_body.ttf", 32)
 			        :enableOutline(cc.c4b(0,0,0,255), 1)
 			        :move(cellpos2)
@@ -403,7 +409,7 @@ function GameListLayer.tableCellAtIndex(view, idx)
                     if view:getParent()._startTouchBeginGameListId ~= realGmaeListIndex2 then
                         return
                     end
-                    if cc.pGetDistance(  view:getParent()._touchEndPos  ,view:getParent()._touchBeginPos ) > view:getParent()._touchCancelDis then
+                    if not view:getParent()._canTouchInGame then
                         return
                     end
                     print("-=-=-=-=-=-================================ down down down ")
@@ -427,7 +433,7 @@ function GameListLayer.tableCellAtIndex(view, idx)
 	                local app = gamelistLayer:getParent():getParent():getApp()
 	                local version = tonumber(app:getVersionMgr():getResVersion(gameinfo._KindID))
 	                if not version or gameinfo._ServerResVersion > version then
-		                gamelistLayer:updateGame(gameinfo, index)
+		                gamelistLayer:updateGame(gameinfo, index , 2)
 	                else
 		                gamelistLayer:onEnterGame(gameinfo, false)
 	                end
@@ -506,11 +512,19 @@ function GameListLayer:onTouchBegan(touch, event)
     print("-=-=-=----------------- touch being")
     local touchPos = touch:getLocation()
     self._touchBeginPos = cc.p( touchPos )
+    self._touchEndPos = nil
+
+    self._canTouchInGame = true
     return true
 end
 
 function GameListLayer:onTouchMoved(touch, event)
     print("-=-=-=----------------- touch move")
+    local touchPos = touch:getLocation()
+    if cc.pGetDistance(touchPos , self._touchBeginPos) > self._touchCancelDis then
+        self._canTouchInGame = false
+    end
+
 end
 
 function GameListLayer:onTouchEnded(touch, event)
@@ -609,7 +623,7 @@ function GameListLayer:dismissPopWait()
 	self:getParent():getParent():dismissPopWait()
 end
 
-function GameListLayer:updateGame(gameinfo, index)
+function GameListLayer:updateGame(gameinfo, index , layerId)
 	local cell = nil
 	if nil ~= index then
 		cell = self._listView:cellAtIndex(index)
@@ -617,20 +631,40 @@ function GameListLayer:updateGame(gameinfo, index)
 
 	self:onGameUpdate(gameinfo)
 	if nil ~= cell then		
-		self.m_spDownloadMask = cell:getChildByName("download_mask")
-		if nil ~= self.m_spDownloadMask then
-			self.m_szMaskSize = self.m_spDownloadMask:getContentSize()			
-		end
-		self.m_labDownloadTip = cell:getChildByName("download_mask_tip")
-		if nil ~= self.m_labDownloadTip then
-			self.m_labDownloadTip:setString("0%")
-		end
-		self.m_spDownloadCycle = cell:getChildByName("download_cycle")
-		if nil ~= self.m_spDownloadCycle then
-			self.m_spDownloadCycle:stopAllActions()
-			self.m_spDownloadCycle:setVisible(true)
-			self.m_spDownloadCycle:runAction(cc.RepeatForever:create(cc.RotateBy:create(1.0, 360)))
-		end
+        if layerId == 1 then
+		    self.m_spDownloadMask = cell:getChildByName("download_mask")
+		    if nil ~= self.m_spDownloadMask then
+			    self.m_szMaskSize = self.m_spDownloadMask:getContentSize()			
+		    end
+		    self.m_labDownloadTip = cell:getChildByName("download_mask_tip")
+		    if nil ~= self.m_labDownloadTip then
+			    self.m_labDownloadTip:setString("0%")
+		    end
+		    self.m_spDownloadCycle = cell:getChildByName("download_cycle")
+		    if nil ~= self.m_spDownloadCycle then
+			    self.m_spDownloadCycle:stopAllActions()
+			    self.m_spDownloadCycle:setVisible(true)
+			    self.m_spDownloadCycle:runAction(cc.RepeatForever:create(cc.RotateBy:create(1.0, 360)))
+		    end
+        end
+        if layerId == 2 then
+            -- 2
+            self.m_spDownloadMask = cell:getChildByName("download_mask2")
+		    if nil ~= self.m_spDownloadMask then
+			    self.m_szMaskSize = self.m_spDownloadMask:getContentSize()			
+		    end
+		    self.m_labDownloadTip = cell:getChildByName("download_mask_tip2")
+		    if nil ~= self.m_labDownloadTip then
+			    self.m_labDownloadTip:setString("0%")
+		    end
+		    self.m_spDownloadCycle = cell:getChildByName("download_cycle2")
+		    if nil ~= self.m_spDownloadCycle then
+			    self.m_spDownloadCycle:stopAllActions()
+			    self.m_spDownloadCycle:setVisible(true)
+			    self.m_spDownloadCycle:runAction(cc.RepeatForever:create(cc.RotateBy:create(1.0, 360)))
+		    end
+        end
+
 	end
 end
 

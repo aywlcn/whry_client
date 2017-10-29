@@ -325,7 +325,7 @@ function ClientScene:onCreate()
 	self._bean = getChildFormObject(areaTop , "atlas_bean") --areaTop:getChildByName("atlas_bean")
 	btn = getChildFormObject(areaTop , "btn_charge") -- areaTop:getChildByName("btn_charge")
     btn:setTag(ClientScene.BT_BEAN_EXCHANGE)
-    --btn:addTouchEventListener(btcallback)
+    btn:addTouchEventListener(btcallback)
     local box = ExternalFun.loadCSB("plaza/ChargeAni.csb", areaTop)
 	box:setPosition(btn:getPosition())
     self.m_btnCharge = box
@@ -1380,11 +1380,17 @@ function ClientScene:onChangeShowMode(nTag, param)
 		self._AreaBottom:runAction(cc.MoveTo:create(0.3,cc.p(667,0)))
 
         -- add by wss 从其他页面回来
-        self._showGirl:runAction(cc.FadeIn:create(0.2))
-        self._activity:runAction(cc.FadeIn:create(0.2))
-        self._leftScrollBtn:runAction(cc.FadeIn:create(0.2))
-        self._rightScrollBtn:runAction(cc.FadeIn:create(0.2))
-
+        if tag == yl.SCENE_ROOMLIST or tag == yl.SCENE_ROOM then
+            self._showGirl:runAction(cc.FadeOut:create(0.2))
+            self._activity:runAction(cc.FadeOut:create(0.2))
+            self._leftScrollBtn:runAction(cc.FadeOut:create(0.2))
+            self._rightScrollBtn:runAction(cc.FadeOut:create(0.2))
+        else
+            self._showGirl:runAction(cc.FadeIn:create(0.2))
+            self._activity:runAction(cc.FadeIn:create(0.2))
+            self._leftScrollBtn:runAction(cc.FadeIn:create(0.2))
+            self._rightScrollBtn:runAction(cc.FadeIn:create(0.2))
+        end
 	else
 		if PriRoom and PriRoom.haveBottomTop(tag) then
 			if self._AreaBottom:getPositionY() < 0 then
@@ -1450,6 +1456,13 @@ function ClientScene:onChangeShowMode(nTag, param)
 			self._head:setVisible(var)
 		end
 		self._bg:loadTexture("plaza/backgroud_plazz.jpg")
+
+        -- add by wss
+        self._showGirl:runAction(cc.FadeOut:create(0.2))
+        self._activity:runAction(cc.FadeOut:create(0.2))
+        self._leftScrollBtn:runAction(cc.FadeOut:create(0.2))
+        self._rightScrollBtn:runAction(cc.FadeOut:create(0.2))
+
 	elseif tag == yl.SCENE_ROOM then
 		self._btExit:setVisible(true)
 		self._btExit:setEnabled(true)
@@ -1458,6 +1471,9 @@ function ClientScene:onChangeShowMode(nTag, param)
 			self._head:setVisible(false)
 		end			
 		self._bg:loadTexture("plaza/backgroud_plazz.jpg")
+
+        
+
 	elseif tag == yl.SCENE_GAMELIST then
 		self._btExit:setVisible(false)
 		self._btExit:setEnabled(false)
@@ -1476,6 +1492,8 @@ function ClientScene:onChangeShowMode(nTag, param)
 		end	
 	else
 		self._bg:loadTexture("plaza/backgroud_plazz.jpg")
+
+        
 	end
 
 	--控制宝箱、喇叭显示	
