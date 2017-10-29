@@ -90,6 +90,9 @@ function GameListLayer:ctor(gamelist)
     -- 每隔cell 的横间隔
     self._cellHSpace = (self._listViewSize.width - self._cellSize.width * 3) / 2
 
+    -- 纵向间隔
+    self._cellVSpace = (self._listViewSize.height - self._cellSize.height * 2)
+
 	--游戏列表
 	self._listView = cc.TableView:create( self._listViewSize )  -- (cc.size(yl.WIDTH, 420)) 
 	self._listView:setDirection(cc.SCROLLVIEW_DIRECTION_HORIZONTAL)    
@@ -224,7 +227,7 @@ function GameListLayer.tableCellAtIndex(view, idx)
     local realGmaeListIndex1 = idx * 2 + 0
     local realGmaeListIndex2 = idx * 2 + 1
 
-    local realHPosHeight1 = view:getParent()._cellSize.height
+    local realHPosHeight1 = view:getParent()._cellSize.height + view:getParent()._cellVSpace
     local realHPosHeight2 = 0
     
 
@@ -239,7 +242,7 @@ function GameListLayer.tableCellAtIndex(view, idx)
         -- 2
         local gameinfo2 = view:getParent()._gameList[realGmaeListIndex2+1]
         local isHaveEndSecondHSpace = false
-        local filestr2 = "GameList/default2.png"
+        local filestr2 = nil --  "GameList/default2.png"
         if gameinfo2 then
             isHaveEndSecondHSpace = true
 
