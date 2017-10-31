@@ -5,7 +5,7 @@
 
 local ClientScene = class("ClientScene", cc.load("mvc").ViewBase)
 
-appdf.req(appdf.BASE_SRC..".function")
+appdf.req(appdf.BASE_SRC.."function")
 
 local PopWait = appdf.req(appdf.BASE_SRC.."app.views.layer.other.PopWait")
 
