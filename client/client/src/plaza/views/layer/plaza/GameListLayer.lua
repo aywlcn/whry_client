@@ -133,6 +133,8 @@ function GameListLayer:ctor(gamelist)
 
     self._canTouchInGame = true  -- 可以点进子游戏中
 
+    -- 是否在 tableView的可显示区域 点击
+    self._isTouchInTableView = false
 end
 
 --获取父场景节点(ClientScene)
@@ -322,6 +324,12 @@ function GameListLayer.tableCellAtIndex(view, idx)
 
                     return true
                 elseif tType == ccui.TouchEventType.ended then   
+                    local touchBeginPos = view:getParent()._touchBeginPos
+                    local listViewRect = cc.rect(view:getParent()._listViewPos.x , view:getParent()._listViewPos.y , view:getParent()._listViewSize.width , view:getParent()._listViewSize.height)
+                    if touchBeginPos.x < listViewRect.x or touchBeginPos.x > listViewRect.x + listViewRect.width  or touchBeginPos.y < listViewRect.y or touchBeginPos.y > listViewRect.y + listViewRect.height then
+                        return
+                    end
+
                     if view:getParent()._startTouchBeginGameListId ~= realGmaeListIndex1 then
                         return
                     end
@@ -412,6 +420,12 @@ function GameListLayer.tableCellAtIndex(view, idx)
 
                     return true
                 elseif tType == ccui.TouchEventType.ended then   
+                    local touchBeginPos = view:getParent()._touchBeginPos
+                    local listViewRect = cc.rect(view:getParent()._listViewPos.x , view:getParent()._listViewPos.y , view:getParent()._listViewSize.width , view:getParent()._listViewSize.height)
+                    if touchBeginPos.x < listViewRect.x or touchBeginPos.x > listViewRect.x + listViewRect.width  or touchBeginPos.y < listViewRect.y or touchBeginPos.y > listViewRect.y + listViewRect.height then
+                        return
+                    end
+
                     if view:getParent()._startTouchBeginGameListId ~= realGmaeListIndex2 then
                         return
                     end
