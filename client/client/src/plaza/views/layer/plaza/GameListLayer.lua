@@ -22,6 +22,8 @@ end
 
 function GameListLayer:ctor(gamelist)
 	print("============= 游戏列表界面创建 =============")
+    dump(gamelist,"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--------- gameList -=-=-=-=--------------")
+
 	self.m_bQuickStart = false
 
 	local this = self
@@ -187,7 +189,7 @@ function GameListLayer.numberOfCellsInTableView(view)
 	if not view:getParent()._gameList then
 		return 0
 	else
-  		return math.floor(#view:getParent()._gameList / 2 )
+  		return math.ceil(#view:getParent()._gameList / 2 )
   	end
 end
 
@@ -242,7 +244,8 @@ function GameListLayer.tableCellAtIndex(view, idx)
         -- 2
         local gameinfo2 = view:getParent()._gameList[realGmaeListIndex2+1]
         local isHaveEndSecondHSpace = false
-        local filestr2 = nil --  "GameList/default2.png"
+        local defaultPng = "GameList/default2.png" 
+        local filestr2 = defaultPng --  "GameList/default2.png"
         if gameinfo2 then
             isHaveEndSecondHSpace = true
 
@@ -493,6 +496,10 @@ function GameListLayer.tableCellAtIndex(view, idx)
 				        spTip2:setPosition(cellpos2)
 			        end
 		        end
+            else
+                game2 = cell:getChildByTag(2)
+                game2:loadTexture (defaultPng)
+                
             end
 	    end	
 
