@@ -10,7 +10,7 @@
 ------
 
 --脚本版本
-local EXTRA_COMMAND_VER = 2 --@version_mark
+local EXTRA_COMMAND_VER = 4 --@version_mark
 local extra_command = {}
 
 local EXTRA_COMMAND_WAIT_SP = "__extra_cmd_wait_sp_node__"
