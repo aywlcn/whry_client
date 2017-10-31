@@ -346,7 +346,7 @@ function GameListLayer.tableCellAtIndex(view, idx)
 	                local app = gamelistLayer:getParent():getParent():getApp()
 	                local version = tonumber(app:getVersionMgr():getResVersion(gameinfo._KindID))
 	                if not version or gameinfo._ServerResVersion > version then
-		                gamelistLayer:updateGame(gameinfo, index , 1)
+		                gamelistLayer:updateGame(gameinfo, cell:getIdx() , 1)
 	                else
 		                gamelistLayer:onEnterGame(gameinfo, false)
 	                end
@@ -436,7 +436,7 @@ function GameListLayer.tableCellAtIndex(view, idx)
 	                local app = gamelistLayer:getParent():getParent():getApp()
 	                local version = tonumber(app:getVersionMgr():getResVersion(gameinfo._KindID))
 	                if not version or gameinfo._ServerResVersion > version then
-		                gamelistLayer:updateGame(gameinfo, index , 2)
+		                gamelistLayer:updateGame(gameinfo, cell:getIdx() , 2)
 	                else
 		                gamelistLayer:onEnterGame(gameinfo, false)
 	                end
