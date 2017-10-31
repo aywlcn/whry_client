@@ -239,6 +239,14 @@ function ClientScene:onCreate()
         end
     end
 
+    -- add by wss
+    -- test par
+--    local par = pp.ParticleEmitter:create()
+--    par:setPosition(cc.p( 500,500))
+--    par:readJsonDataFromFile("gift_effect.par")
+--    self:addChild(par)
+
+
 	self._sceneRecord = {}
 
 	self._sceneLayer = display.newLayer()
