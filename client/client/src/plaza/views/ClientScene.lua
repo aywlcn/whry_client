@@ -231,7 +231,7 @@ function ClientScene:onCreate()
     -- 背景
     self._bg = ccui.ImageView:create("background_2.jpg")
         :move(display.center)
-        :addTo(self)
+        :addTo(self,-5)
 
 	local btcallback = function(ref, type)
         if type == ccui.TouchEventType.ended then
@@ -246,6 +246,13 @@ function ClientScene:onCreate()
 --    par:readJsonDataFromFile("gift_effect.par")
 --    self:addChild(par)
 
+    --背景粒子
+    local par = pp.ParticleEmitter:create()
+    par:setPosition(cc.p( 0,0))
+    par:readJsonDataFromFile("bg_up_flower.par")
+    self:addChild(par)
+
+    
 
 	self._sceneRecord = {}
 
@@ -290,6 +297,26 @@ function ClientScene:onCreate()
 													end)
 													)
 								)				
+
+
+     -- 游戏列表的左右两个按钮
+    self._leftScrollBtn = getChildFormObject(csbNode , "leftScrollBtn") 
+    self._rightScrollBtn = getChildFormObject(csbNode , "rightScrollBtn") 
+    self._leftScrollBtn:setVisible(false)
+    self._rightScrollBtn:setVisible(false)
+
+    -- 左右两个按钮粒子效果
+    self._leftScrollBtnPar = pp.ParticleEmitter:create()
+    self._leftScrollBtnPar:setPosition( cc.p( self._leftScrollBtn:getPosition() ))
+    self._leftScrollBtnPar:readJsonDataFromFile("next_ptr_left.par")
+    self._leftScrollBtnPar:setFirePro_LocalZOrder(1,-50)
+    self:addChild(self._leftScrollBtnPar,-1)
+
+    self._rightScrollBtnPar = pp.ParticleEmitter:create()
+    self._rightScrollBtnPar:setPosition( cc.p( self._rightScrollBtn:getPosition() ))
+    self._rightScrollBtnPar:readJsonDataFromFile("next_ptr_right.par")
+    self._rightScrollBtnPar:setFirePro_LocalZOrder(1,-50)
+    self:addChild(self._rightScrollBtnPar,-1)
 
 	--顶部区域
 	local areaTop = csbNode:getChildByName("top_bg")
@@ -397,10 +424,7 @@ function ClientScene:onCreate()
     self._safeboxBtn:setTag(ClientScene.BT_BANK) -- self._safeboxBtn:setTag(ClientScene.BT_EXCHANGE)
     self._safeboxBtn:addTouchEventListener(btcallback)
 
-    -- 游戏列表的左右两个按钮
-    self._leftScrollBtn = getChildFormObject(csbNode , "leftScrollBtn") 
-    self._rightScrollBtn = getChildFormObject(csbNode , "rightScrollBtn") 
-
+   
 
 
 	--快速开始
@@ -1393,11 +1417,13 @@ function ClientScene:onChangeShowMode(nTag, param)
             self._activity:runAction(cc.FadeOut:create(0.2))
             self._leftScrollBtn:runAction(cc.FadeOut:create(0.2))
             self._rightScrollBtn:runAction(cc.FadeOut:create(0.2))
+
         else
             self._showGirl:runAction(cc.FadeIn:create(0.2))
             self._activity:runAction(cc.FadeIn:create(0.2))
             self._leftScrollBtn:runAction(cc.FadeIn:create(0.2))
             self._rightScrollBtn:runAction(cc.FadeIn:create(0.2))
+
         end
 	else
 		if PriRoom and PriRoom.haveBottomTop(tag) then
@@ -1410,6 +1436,7 @@ function ClientScene:onChangeShowMode(nTag, param)
             self._activity:runAction(cc.FadeIn:create(0.2))
             self._leftScrollBtn:runAction(cc.FadeIn:create(0.2))
             self._rightScrollBtn:runAction(cc.FadeIn:create(0.2))
+
 
 		else
 			if tag == yl.SCENE_GAME then
@@ -1470,6 +1497,7 @@ function ClientScene:onChangeShowMode(nTag, param)
         self._activity:runAction(cc.FadeOut:create(0.2))
         self._leftScrollBtn:runAction(cc.FadeOut:create(0.2))
         self._rightScrollBtn:runAction(cc.FadeOut:create(0.2))
+
 
 	elseif tag == yl.SCENE_ROOM then
 		self._btExit:setVisible(true)

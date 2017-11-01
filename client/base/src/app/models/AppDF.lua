@@ -26,7 +26,7 @@ appdf.DOWN_ERROR_NET		 				= 7 									--下载失败
 --程序版本
 appdf.BASE_C_VERSION = 2 --@app_version
 --资源版本
-appdf.BASE_C_RESVERSION = 4 --@client_version
+appdf.BASE_C_RESVERSION = 5 --@client_version
 appdf.BASE_GAME = 
 {
 	--{kind = 6,version = "0"}

@@ -297,7 +297,15 @@ function GameListLayer.tableCellAtIndex(view, idx)
 			    cell:addChild(mask)
 			    mask:setName("download_mask")
 
-                mask:setVisible(false)
+                --mask:setVisible(false)
+                -- add by wss
+                local app = view:getParent():getParent():getParent():getApp()
+	            local version = tonumber(app:getVersionMgr():getResVersion(gameinfo._KindID))
+	            if not version or gameinfo._ServerResVersion > version then
+		            mask:setVisible(true)
+	            else
+		            mask:setVisible(false)
+                end
 
 			    spTip = cc.Label:createWithTTF("", "fonts/round_body.ttf", 32)
 				    :enableOutline(cc.c4b(0,0,0,255), 1)
@@ -359,7 +367,11 @@ function GameListLayer.tableCellAtIndex(view, idx)
 	                if not version or gameinfo._ServerResVersion > version then
 		                gamelistLayer:updateGame(gameinfo, cell:getIdx() , 1)
 	                else
+                        --mask:setVisible(false)
+--                        cell:getChildByName("download_mask"):setVisible(false)
+--                        cell:getChildByName("download_mask"):getChildByName("download_mask_sp"):setVisible(false)
 		                gamelistLayer:onEnterGame(gameinfo, false)
+                        
 	                end
 
 
@@ -393,7 +405,15 @@ function GameListLayer.tableCellAtIndex(view, idx)
 			    cell:addChild(mask2)
 			    mask2:setName("download_mask2")
 
-                mask2:setVisible(false)
+                --mask2:setVisible(false)
+                -- add by wss
+                local app = view:getParent():getParent():getParent():getApp()
+	            local version = tonumber(app:getVersionMgr():getResVersion(gameinfo2._KindID))
+	            if not version or gameinfo2._ServerResVersion > version then
+		            mask2:setVisible(true)
+	            else
+		            mask2:setVisible(false)
+                end
 
 			    spTip = cc.Label:createWithTTF("", "fonts/round_body.ttf", 32)
 			        :enableOutline(cc.c4b(0,0,0,255), 1)
@@ -455,7 +475,11 @@ function GameListLayer.tableCellAtIndex(view, idx)
 	                if not version or gameinfo._ServerResVersion > version then
 		                gamelistLayer:updateGame(gameinfo, cell:getIdx() , 2)
 	                else
-		                gamelistLayer:onEnterGame(gameinfo, false)
+                        --mask2:setVisible(false)
+--		                cell:getChildByName("download_mask2"):setVisible(false)
+--                        cell:getChildByName("download_mask2"):getChildByName("download_mask_sp2"):setVisible(false)
+                        gamelistLayer:onEnterGame(gameinfo, false)
+                        
 	                end
 
 
@@ -474,6 +498,14 @@ function GameListLayer.tableCellAtIndex(view, idx)
 
 		    mask = cell:getChildByName("download_mask")
 		    if nil ~= mask then
+                local app = view:getParent():getParent():getParent():getApp()
+	            local version = tonumber(app:getVersionMgr():getResVersion(gameinfo._KindID))
+	            if not version or gameinfo._ServerResVersion > version then
+		            mask:setVisible(true)
+	            else
+		            mask:setVisible(false)
+                end
+
 			    local sp = mask:getChildByName("download_mask_sp")
 			    if nil ~= sp then
 				    local size = sp:getContentSize()
@@ -496,6 +528,14 @@ function GameListLayer.tableCellAtIndex(view, idx)
 
 		        mask2 = cell:getChildByName("download_mask2")
 		        if nil ~= mask2 then
+                    local app = view:getParent():getParent():getParent():getApp()
+	                local version = tonumber(app:getVersionMgr():getResVersion(gameinfo2._KindID))
+	                if not version or gameinfo2._ServerResVersion > version then
+		                mask2:setVisible(true)
+	                else
+		                mask2:setVisible(false)
+                    end
+
 			        local sp = mask2:getChildByName("download_mask_sp2")
 			        if nil ~= sp then
 				        local size = sp:getContentSize()
