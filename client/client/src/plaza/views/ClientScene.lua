@@ -459,7 +459,7 @@ function ClientScene:onCreate()
 	btn:addTouchEventListener(btcallback) 
 	self.m_btnTask = btn
 	--排行	
-	btn = getChildFormObject(areaBottom , "btn_task") -- areaBottom:getChildByName("btn_rank")
+	btn = getChildFormObject(areaBottom , "btn_rank") -- areaBottom:getChildByName("btn_rank")
 	btn:setTag(ClientScene.BT_RANK)
 	btn:addTouchEventListener(btcallback) 	
 
