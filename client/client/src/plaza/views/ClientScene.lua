@@ -1361,7 +1361,7 @@ function ClientScene:onChangeShowMode(nTag, param)
 	end
 
 	--目标页面
-	local dst_layer = self:getTagLayer(tag, param)
+	local dst_layer = self:getTagLayer(tag, param )
 	if dst_layer then
 		--游戏界面不触发切换动画
 		if tag == yl.SCENE_GAME then
@@ -1418,12 +1418,16 @@ function ClientScene:onChangeShowMode(nTag, param)
             self._leftScrollBtn:runAction(cc.FadeOut:create(0.2))
             self._rightScrollBtn:runAction(cc.FadeOut:create(0.2))
 
+            self._leftScrollBtnPar:setVisible(false)
+            self._rightScrollBtnPar:setVisible(false)
         else
             self._showGirl:runAction(cc.FadeIn:create(0.2))
             self._activity:runAction(cc.FadeIn:create(0.2))
             self._leftScrollBtn:runAction(cc.FadeIn:create(0.2))
             self._rightScrollBtn:runAction(cc.FadeIn:create(0.2))
 
+            self._leftScrollBtnPar:setVisible(true)
+            self._rightScrollBtnPar:setVisible(true)
         end
 	else
 		if PriRoom and PriRoom.haveBottomTop(tag) then
@@ -1437,6 +1441,8 @@ function ClientScene:onChangeShowMode(nTag, param)
             self._leftScrollBtn:runAction(cc.FadeIn:create(0.2))
             self._rightScrollBtn:runAction(cc.FadeIn:create(0.2))
 
+            self._leftScrollBtnPar:setVisible(true)
+            self._rightScrollBtnPar:setVisible(true)
 
 		else
 			if tag == yl.SCENE_GAME then
@@ -1451,6 +1457,9 @@ function ClientScene:onChangeShowMode(nTag, param)
             self._activity:runAction(cc.FadeOut:create(0.2))
             self._leftScrollBtn:runAction(cc.FadeOut:create(0.2))
             self._rightScrollBtn:runAction(cc.FadeOut:create(0.2))
+
+            self._leftScrollBtnPar:setVisible(false)
+            self._rightScrollBtnPar:setVisible(false)
 
 		end				
 	end
@@ -1498,6 +1507,8 @@ function ClientScene:onChangeShowMode(nTag, param)
         self._leftScrollBtn:runAction(cc.FadeOut:create(0.2))
         self._rightScrollBtn:runAction(cc.FadeOut:create(0.2))
 
+        self._leftScrollBtnPar:setVisible(false)
+        self._rightScrollBtnPar:setVisible(false)
 
 	elseif tag == yl.SCENE_ROOM then
 		self._btExit:setVisible(true)
@@ -1562,7 +1573,7 @@ function ClientScene:onChangeShowMode(nTag, param)
 end
 
 --获取页面
-function ClientScene:getTagLayer(tag, param)
+function ClientScene:getTagLayer(tag, param )
 	local dst
 	if tag == yl.SCENE_GAMELIST then
 		dst =  GameListView:create(self:getApp()._gameList)
@@ -1590,7 +1601,7 @@ function ClientScene:getTagLayer(tag, param)
 	elseif tag == yl.SCENE_OPTION then
 		dst = Option:create(self)
 	elseif tag == yl.SCENE_BANK then
-		dst = Bank:create(self, self._gameFrame)
+		dst = Bank:create(self, self._gameFrame , param)
 	elseif tag == yl.SCENE_RANKINGLIST then
 		dst = RankingList:create(self, param)
 	elseif tag == yl.SCENE_TASK then

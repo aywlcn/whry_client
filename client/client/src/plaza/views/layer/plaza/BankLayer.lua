@@ -31,7 +31,7 @@ BankLayer.BT_ENABLE_RETURN	= 30
 BankLayer.BT_ENABLE_BACK	= 31
 BankLayer.BT_ENABLE_CONFIRM = 32
 
-function BankLayer:ctor(scene, gameFrame)
+function BankLayer:ctor(scene, gameFrame , isGiftScene)
 	ExternalFun.registerNodeEvent(self)
 		
 	self._scene = scene
@@ -353,6 +353,37 @@ function BankLayer:ctor(scene, gameFrame)
     if 0 == GlobalUserItem.cbInsureEnabled then
         self:initEnableBankLayer()
     end
+
+    
+end
+
+-- add by wss 
+function BankLayer:showBankLayer()
+    local transfermode = true
+	self._cbtTransfer:setSelected(transfermode)
+	self._cbtSaveTake:setSelected(not transfermode)
+	self._transferArea:setVisible(transfermode)
+	self._takesaveArea:setVisible(not transfermode)
+
+	self.edit_Score:setText("")
+	self.edit_TransferScore:setText("")
+	self.m_textNumber:setString("")
+
+    --手续费
+    local str = string.format("提示:存入游戏币免手续费,取出将扣除%d‰的手续费。存款无需输入银行密码。", self.m_tabBankConfigInfo.wRevenueTake)
+	--调整位置
+	if transfermode then 
+		self.m_textNumber:setPosition(930, 365)
+        str = string.format("提示:普通玩家游戏币赠送需扣除%d‰的手续费。", self.m_tabBankConfigInfo.wRevenueTransfer)
+        if 0 ~= GlobalUserItem.cbMemberOrder then
+            local vipConfig = GlobalUserItem.MemberList[GlobalUserItem.cbMemberOrder]
+            str = str .. vipConfig._name .. "扣除" .. vipConfig._insure .. "‰手续费。"
+        end
+        self._notifyTextPresent:setString(str)
+	else
+		self.m_textNumber:setPosition(930, 330)
+        self._notifyText:setString(str)
+	end        
 end
 
 function BankLayer:initEnableBankLayer()
@@ -768,6 +799,12 @@ function BankLayer:onBankCallBack(result,message)
         self._txtInsure:setString(string.formatNumberThousands(GlobalUserItem.lUserInsure,true,"/"))
         self._txtScore:setString(string.formatNumberThousands(GlobalUserItem.lUserScore,true,"/"))
 	end
+
+
+    if isGiftScene then
+        print("-=--=-=--------------------- isGiftScene")
+        self:showBankLayer()
+    end
 end
 
 --显示等待

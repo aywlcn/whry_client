@@ -38,7 +38,8 @@ function HeadSprite.checkData(useritem)
 	useritem.dwUserID = useritem.dwUserID or 0
 	useritem.dwCustomID = useritem.dwCustomID or 0
 	useritem.wFaceID = useritem.wFaceID or 0
-	if useritem.wFaceID > 199 then
+	--if useritem.wFaceID > 199 then
+    if useritem.wFaceID > 24 then
 		useritem.wFaceID = 0
 	end
 	useritem.cbMemberOrder = useritem.cbMemberOrder or 0
