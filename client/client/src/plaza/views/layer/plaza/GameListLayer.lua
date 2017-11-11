@@ -20,6 +20,9 @@ function GameListLayer:onExitTransitionStart()
     return self
 end
 
+-- 动画数组
+menuBtnAnimationVec = {}
+
 function GameListLayer:ctor(gamelist)
 	print("============= 游戏列表界面创建 =============")
     dump(gamelist,"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--------- gameList -=-=-=-=--------------")
@@ -62,6 +65,41 @@ function GameListLayer:ctor(gamelist)
 	self:setContentSize(yl.WIDTH,yl.HEIGHT)
 
 	self._gameList = gamelist
+
+    -- 动画的张数
+    self._animationNumVec = {
+        [6] = 10,
+        [104] = 8,
+        [122] = 8,
+        [123] = 9,
+        [140] = 9,
+        [503] = 9,
+        [508] = 10,
+        [510] = 8,
+        [511] = 10,
+        [516] = 9,
+    }
+    -- 动画数组
+    --self._menuBtnAnimationVec = {}
+    for k,v in pairs(self._gameList) do
+        --- 动画
+        local animation = cc.Animation:create()  
+        if self._animationNumVec[tonumber(v._KindID)] then
+            for i=1 , self._animationNumVec[tonumber(v._KindID)] do
+                print( "-=-=-=-=-=------------ addSpriteFrameWithFile" .. v._KindID )
+                animation:addSpriteFrameWithFile("GameList/game_" ..v._KindID.."/" .. i .. ".png" )
+            end
+        end
+
+        animation:setDelayPerUnit(0.15)
+        animation:setLoops(-1)
+        animation:setRestoreOriginalFrame(true)
+        local action = cc.Animate:create(animation)
+        action:retain()
+        menuBtnAnimationVec[tonumber(v._KindID)] = action
+
+    end
+
 
     local logonCallBack = function (result,message)
 		this:onLogonCallBack(result,message)
@@ -135,6 +173,10 @@ function GameListLayer:ctor(gamelist)
 
     -- 是否在 tableView的可显示区域 点击
     self._isTouchInTableView = false
+
+    
+
+    
 end
 
 --获取父场景节点(ClientScene)
@@ -243,6 +285,8 @@ function GameListLayer.tableCellAtIndex(view, idx)
 	    if false == cc.FileUtils:getInstance():isFileExist(filestr) then
 		    filestr = "GameList/default2.png"
 	    end
+
+        
         -- 2
         local gameinfo2 = view:getParent()._gameList[realGmaeListIndex2+1]
         local isHaveEndSecondHSpace = false
@@ -278,6 +322,16 @@ function GameListLayer.tableCellAtIndex(view, idx)
 			    :setAnchorPoint(cc.p(0.5, 0))
 			    :setPosition( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight1 )   -- (view:getParent().m_fThird * 0.5, 0)   --
 			    :setTag(1)
+                :setOpacity(1)
+            
+            local acSprite = cc.Sprite:create()
+            acSprite:setAnchorPoint(cc.p(0.5, 0))
+            acSprite:setPosition( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight1 )
+            acSprite:addTo(cell)
+            acSprite:setName("acSprite")
+            acSprite:runAction( menuBtnAnimationVec[tonumber(gameinfo._KindID)] )  -- 
+
+
 		    local maskSp = cc.Sprite:create(filestr)
 		    local pos = cc.p(0,0)
 		    if nil ~= maskSp then			
@@ -385,6 +439,14 @@ function GameListLayer.tableCellAtIndex(view, idx)
 			    :setAnchorPoint(cc.p(0.5, 0))
 			    :setPosition( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight2 )   -- (view:getParent().m_fThird * 0.5, 0)   --
 			    :setTag(2)
+                :setOpacity(1)
+
+            local acSprite = cc.Sprite:create()
+            acSprite:setAnchorPoint(cc.p(0.5, 0))
+            acSprite:setPosition( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight2 )
+            acSprite:addTo(cell)
+            acSprite:setName("acSprite2")
+            acSprite:runAction( menuBtnAnimationVec[tonumber(gameinfo2._KindID)] )  -- 
 
 		    local maskSp2 = cc.Sprite:create(filestr2)
 		    local pos = cc.p(0,0)
@@ -496,6 +558,9 @@ function GameListLayer.tableCellAtIndex(view, idx)
 
 		    game:loadTexture(filestr)
 
+            local acSprite = cell:getChildByName("acSprite")
+            acSprite:runAction( menuBtnAnimationVec[tonumber(gameinfo._KindID)] )
+
 		    mask = cell:getChildByName("download_mask")
 		    if nil ~= mask then
                 local app = view:getParent():getParent():getParent():getApp()
@@ -525,6 +590,9 @@ function GameListLayer.tableCellAtIndex(view, idx)
             if isHaveEndSecondHSpace then
                 game2 = cell:getChildByTag(2)
 		        game2:loadTexture (filestr2)
+
+                local acSprite2 = cell:getChildByName("acSprite2")
+                acSprite2:runAction( menuBtnAnimationVec[tonumber(gameinfo2._KindID)] )
 
 		        mask2 = cell:getChildByName("download_mask2")
 		        if nil ~= mask2 then

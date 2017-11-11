@@ -7,6 +7,10 @@ yl.DEVICE_TYPE							= 0x10
 yl.KIND_ID								= 122
 yl.STATION_ID							= 1
 
+-- add by wss 
+-- 设置一个默认的银行密码
+yl.DEFAULT_PASSWORD = ""
+
 --测试
 yl.LOGONSERVER							= "61.160.247.37" --@login_ip
 -- 登陆地址列表

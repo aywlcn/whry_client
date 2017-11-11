@@ -98,6 +98,8 @@ ClientScene.BT_TRUMPET		= 18
 ClientScene.BT_PERSON		= 19
 ClientScene.BT_BEAN_EXCHANGE	= 20
 
+ClientScene.BT_EMAIL = 21
+ClientScene.BT_ACTIVITY = 22
 
 local HELP_LAYER_NAME = "__introduce_help_layer__"
 local HELP_BTN_NAME = "__introduce_help_button__"
@@ -397,7 +399,9 @@ function ClientScene:onCreate()
     self._showGirl = csbNode:getChildByName("showGirl")
 
     -- 精彩活动
-    self._activity = csbNode:getChildByName("activityBtn")
+    self._activity = getChildFormObject(csbNode , "activityBtn") 
+    self._activity:setTag(ClientScene.BT_ACTIVITY)
+	self._activity:addTouchEventListener(btcallback) 	
 
     -- 昵称
     self._nickName = getChildFormObject(csbNode , "nickname")  
@@ -462,6 +466,11 @@ function ClientScene:onCreate()
 	btn = getChildFormObject(areaBottom , "btn_rank") -- areaBottom:getChildByName("btn_rank")
 	btn:setTag(ClientScene.BT_RANK)
 	btn:addTouchEventListener(btcallback) 	
+
+    -- 邮件
+    self._emailBtn = getChildFormObject(areaBottom , "btn_email") 
+    self._emailBtn:setTag(ClientScene.BT_EMAIL)
+	self._emailBtn:addTouchEventListener(btcallback) 	
 
 	--喇叭
 	self._notify = csbNode:getChildByName("sp_trumpet_bg")
@@ -1164,8 +1173,13 @@ function ClientScene:onButtonClickedEvent(tag,ref)
 			end	
 			self:onChangeShowMode(yl.SCENE_BANK)		
 		elseif tag == ClientScene.BT_RANK then
-			local param = self.m_nPreTag
-			self:onChangeShowMode(yl.SCENE_RANKINGLIST, param)
+			--local param = self.m_nPreTag
+			--self:onChangeShowMode(yl.SCENE_RANKINGLIST, param)
+            showToast(self, "暂未开放!", 1)
+        elseif tag == ClientScene.BT_EMAIL then
+            showToast(self, "暂未开放!", 1)
+        elseif tag == ClientScene.BT_ACTIVITY then
+            showToast(self, "暂未开放!", 1)
 		elseif tag == ClientScene.BT_TASK then
 			if false == GlobalUserItem.bEnableTask then
 				showToast(self, "当前功能暂未开放,敬请期待!", 2)

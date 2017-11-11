@@ -502,12 +502,12 @@ end
 
 function SelectHeadLayer.numberOfCellsInTableView( view )
 	--一行10个，200个
-	return self._headImageHangNum
+	return 3
 end
 
 function SelectHeadLayer:tableCellAtIndex( view, idx )
 	local cell = view:dequeueCell()
-	idx = self._headImageHangNum - 1 - idx
+	idx = 3 - 1 - idx
 	--[[if nil ~= cell and nil ~= cell:getChildByName("head_item_view") then
 		cell:removeChildByName("head_item_view", true)	
 	end]]

@@ -300,6 +300,9 @@ function FriendLayer:initWithButton()
         end
     end)
 
+    -- add by wss
+    btn:setVisible(false)
+
     -- 通讯录
     btn = FriendAddLayer:getChildByName("BtnTelList")
     btn:addTouchEventListener(function(ref, tType)
@@ -315,6 +318,9 @@ function FriendLayer:initWithButton()
         end
     end)
 
+    -- add by wss
+    btn:setVisible(false)
+
     -- 微信
     btn = FriendAddLayer:getChildByName("BtnWechat")
     btn:addTouchEventListener(function(ref, tType)
@@ -328,6 +334,9 @@ function FriendLayer:initWithButton()
             MultiPlatform:getInstance():shareToTarget(yl.ThirdParty.WECHAT, sharecall, "有人@你一起玩游戏！", "你的好友正在玩游戏！玩法超多超精彩！快来打败他！", url, "")
         end
     end)
+
+    -- add by wss
+    btn:setVisible(false)
 end
 
 --初始化好友列表

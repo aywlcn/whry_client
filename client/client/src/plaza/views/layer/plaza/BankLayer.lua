@@ -167,7 +167,7 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
     	:setTag(BankLayer.BT_CHECK)
     	:addTo(self._takesaveArea)
     	:addTouchEventListener(btcallback)
-    self._notifyText = cc.Label:createWithTTF("提示：存入游戏币免手续费，取出将扣除 的手续费。存款无需输入银行密码。", "fonts/round_body.ttf", 24)
+    self._notifyText = cc.Label:createWithTTF("提示：存入游戏币免手续费，取出将扣除 的手续费。", "fonts/round_body.ttf", 24)
 								:addTo(self._takesaveArea)
 								:setTextColor(cc.c4b(136,164,224,255))
 								:move(1250/2,38)
@@ -191,6 +191,7 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
     display.newSprite("Bank/text_bank_password.png")
     	:move(305,210)
     	:addTo(self._takesaveArea)
+        :setVisible(false)
 
     --金额大写提示
     self.m_textNumber = ClipText:createClipText(cc.size(350,24), "", "fonts/round_body.ttf", 24)
@@ -227,6 +228,10 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
 		:setPlaceHolder("存款不需要密码")
 		:addTo(self._takesaveArea)
 
+        -- add by wss
+        self.edit_Password:setVisible(false)
+
+
 	--赠送界面
 	self._transferArea = display.newLayer()
 		:setContentSize(1250,520)
@@ -243,6 +248,7 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
     display.newSprite("Bank/text_bank_password.png")
     	:move(300,240)
     	:addTo(self._transferArea)
+        :setVisible(false)
 
    	ccui.Button:create("Bank/bt_bank_present_0.png", "Bank/bt_bank_present_1.png")
 		:move(625,117)
@@ -290,6 +296,9 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
 		:setPlaceHolder("请输入银行密码")
 		:addTo(self._transferArea)
 
+        -- add by wss
+        self.edit_TransferPassword:setVisible(false)
+
 	--其他功能
     self._txtPresentChs = cc.LabelAtlas:_create("", "Bank/bank_num_0.png", 30, 32, string.byte("0")) 
     		:move(898,305)
@@ -305,7 +314,7 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
     	:setTag(BankLayer.BT_CHECK)
     	:addTo(self._transferArea)
     	:addTouchEventListener(btcallback)
-    self._notifyTextPresent = cc.Label:createWithTTF("提示：存入游戏币免手续费，取出将扣除 的手续费。存款无需输入银行密码。", "fonts/round_body.ttf", 24)
+    self._notifyTextPresent = cc.Label:createWithTTF("提示：存入游戏币免手续费，取出将扣除 的手续费。", "fonts/round_body.ttf", 24)
 								:addTo(self._transferArea)
 								:setTextColor(cc.c4b(136,164,224,255))
 								:move(1250/2,38)
@@ -351,7 +360,13 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
     	:addTouchEventListener(btcallback)
 
     if 0 == GlobalUserItem.cbInsureEnabled then
-        self:initEnableBankLayer()
+        -- add by wss  不显示设置面板了，直接设置一个默认值
+        --self:initEnableBankLayer()
+
+        -- 直接设置一个银行密码  
+        self:showPopWait()
+	    self._bankFrame:onEnableBank(yl.DEFAULT_PASSWORD)
+
     end
 
     
@@ -370,7 +385,7 @@ function BankLayer:showBankLayer()
 	self.m_textNumber:setString("")
 
     --手续费
-    local str = string.format("提示:存入游戏币免手续费,取出将扣除%d‰的手续费。存款无需输入银行密码。", self.m_tabBankConfigInfo.wRevenueTake)
+    local str = string.format("提示:存入游戏币免手续费,取出将扣除%d‰的手续费。", self.m_tabBankConfigInfo.wRevenueTake)
 	--调整位置
 	if transfermode then 
 		self.m_textNumber:setPosition(930, 365)
@@ -547,7 +562,7 @@ function BankLayer:onSelectedEvent(sender,eventType)
 		self.m_textNumber:setString("")
 
         --手续费
-        local str = string.format("提示:存入游戏币免手续费,取出将扣除%d‰的手续费。存款无需输入银行密码。", self.m_tabBankConfigInfo.wRevenueTake)
+        local str = string.format("提示:存入游戏币免手续费,取出将扣除%d‰的手续费。", self.m_tabBankConfigInfo.wRevenueTake)
 		--调整位置
 		if transfermode then 
 			self.m_textNumber:setPosition(930, 365)
@@ -652,17 +667,19 @@ function BankLayer:onTakeScore()
         return
     end
 
-	if #szPass < 1 then 
-		showToast(self,"请输入银行密码！",2)
-		return
-	end
-	if #szPass <6 then
-		showToast(self,"密码必须大于6个字符，请重新输入！",2)
-		return
-	end
+--	if #szPass < 1 then 
+--		showToast(self,"请输入银行密码！",2)
+--		return
+--	end
+--	if #szPass <6 then
+--		showToast(self,"密码必须大于6个字符，请重新输入！",2)
+--		return
+--	end
 
 	self:showPopWait()
-	self._bankFrame:onTakeScore(lOperateScore,szPass)
+    -- add by wss , 用默认的密码
+	-- self._bankFrame:onTakeScore(lOperateScore,szPass)
+    self._bankFrame:onTakeScore(lOperateScore,yl.DEFAULT_PASSWORD)
 end
 
 --存款
@@ -720,14 +737,14 @@ function BankLayer:onTransferScore()
 		return
 	end
 
-	if #szPass < 1 then 
-		showToast(self,"请输入钱包密码！",2)
-		return
-	end
-	if #szPass <6 then
-		showToast(self,"密码必须大于6个字符，请重新输入！",2)
-		return
-	end
+--	if #szPass < 1 then 
+--		showToast(self,"请输入钱包密码！",2)
+--		return
+--	end
+--	if #szPass <6 then
+--		showToast(self,"密码必须大于6个字符，请重新输入！",2)
+--		return
+--	end
 
 	if #szTarget < 1 then 
 		showToast(self,"请输入赠送用户ID！",2)
@@ -735,7 +752,10 @@ function BankLayer:onTransferScore()
 	end
 
 	self:showPopWait()
-	self._bankFrame:onTransferScore(lOperateScore,szTarget,szPass,byID)
+    -- add by wss
+	--self._bankFrame:onTransferScore(lOperateScore,szTarget,szPass,byID)
+    self._bankFrame:onTransferScore(lOperateScore,szTarget,yl.DEFAULT_PASSWORD,byID)
+
 end
 
 --操作结果
@@ -793,7 +813,7 @@ function BankLayer:onBankCallBack(result,message)
 
         self.m_tabBankConfigInfo = message
 		--取款收费比例
-		local str = string.format("提示:存入游戏币免手续费,取出将扣除%d‰的手续费。存款无需输入银行密码。", message.wRevenueTake)
+		local str = string.format("提示:存入游戏币免手续费,取出将扣除%d‰的手续费。", message.wRevenueTake)
         self._notifyText:setString(str)
 
         self._txtInsure:setString(string.formatNumberThousands(GlobalUserItem.lUserInsure,true,"/"))
