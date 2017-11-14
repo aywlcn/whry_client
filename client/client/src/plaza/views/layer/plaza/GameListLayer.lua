@@ -12,6 +12,7 @@ local LogonFrame = appdf.req(appdf.CLIENT_SRC.."plaza.models.LogonFrame")
 -- 进入场景而且过渡动画结束时候触发。
 function GameListLayer:onEnterTransitionFinish()
 	self._listView:reloadData()
+
     return self
 end
 
@@ -87,20 +88,32 @@ function GameListLayer:ctor(gamelist)
         if self._animationNumVec[tonumber(v._KindID)] then
             for i=1 , self._animationNumVec[tonumber(v._KindID)] do
                 print( "-=-=-=-=-=------------ addSpriteFrameWithFile" .. v._KindID )
-                animation:addSpriteFrameWithFile("GameList/game_" ..v._KindID.."/" .. i .. ".png" )
+                local targetPlatform = cc.Application:getInstance():getTargetPlatform()
+                local filename = "GameList/game_" ..v._KindID.."/" .. i .. ".png"
+                --assert( cc.FileUtils:getInstance():isFileExist(filename) , string.format("--------------file %s not exist" , filename ) )
+
+				--if cc.PLATFORM_OS_WINDOWS == targetPlatform then
+                    animation:addSpriteFrameWithFile( filename )
+                --else
+                --    animation:addSpriteFrameWithFile( device.writablePath .. "res/GameList/game_" ..v._KindID.."/" .. i .. ".png" )
+                --end
+                
             end
         end
 
         animation:setDelayPerUnit(0.15)
-        animation:setLoops(-1)
+        --animation:setLoops(-1)
         animation:setRestoreOriginalFrame(true)
+        animation:retain()
+
         local action = cc.Animate:create(animation)
+        action = cc.Speed:create(cc.RepeatForever:create(action), 1)
         action:retain()
         menuBtnAnimationVec[tonumber(v._KindID)] = action
 
     end
 
-
+   
     local logonCallBack = function (result,message)
 		this:onLogonCallBack(result,message)
 	end
@@ -322,14 +335,14 @@ function GameListLayer.tableCellAtIndex(view, idx)
 			    :setAnchorPoint(cc.p(0.5, 0))
 			    :setPosition( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight1 )   -- (view:getParent().m_fThird * 0.5, 0)   --
 			    :setTag(1)
-                :setOpacity(1)
+                :setOpacity(255)
             
             local acSprite = cc.Sprite:create()
             acSprite:setAnchorPoint(cc.p(0.5, 0))
             acSprite:setPosition( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight1 )
             acSprite:addTo(cell)
             acSprite:setName("acSprite")
-            acSprite:runAction( menuBtnAnimationVec[tonumber(gameinfo._KindID)] )  -- 
+            acSprite:runAction( menuBtnAnimationVec[tonumber(gameinfo._KindID)] )
 
 
 		    local maskSp = cc.Sprite:create(filestr)
@@ -439,14 +452,14 @@ function GameListLayer.tableCellAtIndex(view, idx)
 			    :setAnchorPoint(cc.p(0.5, 0))
 			    :setPosition( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight2 )   -- (view:getParent().m_fThird * 0.5, 0)   --
 			    :setTag(2)
-                :setOpacity(1)
+                :setOpacity(255)
 
-            local acSprite = cc.Sprite:create()
-            acSprite:setAnchorPoint(cc.p(0.5, 0))
-            acSprite:setPosition( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight2 )
-            acSprite:addTo(cell)
-            acSprite:setName("acSprite2")
-            acSprite:runAction( menuBtnAnimationVec[tonumber(gameinfo2._KindID)] )  -- 
+            local acSprite2 = cc.Sprite:create()
+            acSprite2:setAnchorPoint(cc.p(0.5, 0))
+            acSprite2:setPosition( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight2 )
+            acSprite2:addTo(cell)
+            acSprite2:setName("acSprite2")
+            acSprite2:runAction( menuBtnAnimationVec[tonumber(gameinfo2._KindID)] )  -- 
 
 		    local maskSp2 = cc.Sprite:create(filestr2)
 		    local pos = cc.p(0,0)
@@ -559,6 +572,7 @@ function GameListLayer.tableCellAtIndex(view, idx)
 		    game:loadTexture(filestr)
 
             local acSprite = cell:getChildByName("acSprite")
+            acSprite:stopAllActions()
             acSprite:runAction( menuBtnAnimationVec[tonumber(gameinfo._KindID)] )
 
 		    mask = cell:getChildByName("download_mask")
@@ -592,6 +606,7 @@ function GameListLayer.tableCellAtIndex(view, idx)
 		        game2:loadTexture (filestr2)
 
                 local acSprite2 = cell:getChildByName("acSprite2")
+                acSprite2:stopAllActions()
                 acSprite2:runAction( menuBtnAnimationVec[tonumber(gameinfo2._KindID)] )
 
 		        mask2 = cell:getChildByName("download_mask2")

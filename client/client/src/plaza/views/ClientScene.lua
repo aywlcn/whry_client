@@ -1356,7 +1356,8 @@ function ClientScene:onChangeShowMode(nTag, param)
 	if curtag then
 		local cur_layer = self._sceneLayer:getChildByTag(curtag)
 		if cur_layer then
-			cur_layer:stopAllActions()
+            -- add by wss
+			--cur_layer:stopAllActions()
 			--游戏界面不触发切换动画
 			if tag == yl.SCENE_GAME or curtag == yl.SCENE_GAME then
 				cur_layer:removeFromParent()
@@ -1396,7 +1397,8 @@ function ClientScene:onChangeShowMode(nTag, param)
 			end
 
 			dst_layer:addTo(self._sceneLayer)
-			dst_layer:stopAllActions()
+            -- add by wss
+			--dst_layer:stopAllActions()
 			dst_layer:runAction(cc.Sequence:create(
 					 								cc.MoveTo:create(0.3,cc.p(0,0)),
 					 								cc.CallFunc:create(function()
