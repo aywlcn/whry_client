@@ -399,14 +399,14 @@ function BankLayer:showBankLayer()
 
         --self._notifyTextPresent:setString(str)
         --add by wss
-        local str2 = string.format("提示:默认银行密码为:%s" , yl.DEFAULT_PASSWORD)
+        local str2 = string.format("提示:默认银行密码为:%s 如未更改请尽快更改" , yl.DEFAULT_PASSWORD)
         self._notifyTextPresent:setString(str2)
 	else
 		self.m_textNumber:setPosition(930, 330)
         --self._notifyText:setString(str)
 
         --add by wss
-        local str2 = string.format("提示:默认银行密码为:%s" , yl.DEFAULT_PASSWORD)
+        local str2 = string.format("提示:默认银行密码为:%s 如未更改请尽快更改" , yl.DEFAULT_PASSWORD)
         self._notifyText:setString(str2)
 	end        
 end
@@ -584,14 +584,14 @@ function BankLayer:onSelectedEvent(sender,eventType)
             --self._notifyTextPresent:setString(str)
 
             --add by wss
-            local str2 = string.format("提示:默认银行密码为:%s" , yl.DEFAULT_PASSWORD)
+            local str2 = string.format("提示:默认银行密码为:%s 如未更改请尽快更改" , yl.DEFAULT_PASSWORD)
             self._notifyTextPresent:setString(str2)
 		else
 			self.m_textNumber:setPosition(930, 330)
             --self._notifyText:setString(str)
 
             --add by wss
-            local str2 = string.format("提示:默认银行密码为:%s" , yl.DEFAULT_PASSWORD)
+            local str2 = string.format("提示:默认银行密码为:%s 如未更改请尽快更改" , yl.DEFAULT_PASSWORD)
             self._notifyText:setString(str2)
 		end        
 	elseif tag == BankLayer.CBT_BY_ID or tag == BankLayer.CBT_BY_NAME then
@@ -835,7 +835,7 @@ function BankLayer:onBankCallBack(result,message)
         self._notifyText:setString(str)
 
         --add by wss
-        local str2 = string.format("提示:默认银行密码为:%s" , yl.DEFAULT_PASSWORD)
+        local str2 = string.format("提示:默认银行密码为:%s 如未更改请尽快更改" , yl.DEFAULT_PASSWORD)
         self._notifyText:setString(str2)
 
         self._txtInsure:setString(string.formatNumberThousands(GlobalUserItem.lUserInsure,true,"/"))
