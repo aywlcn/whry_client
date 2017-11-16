@@ -9,7 +9,7 @@ yl.STATION_ID							= 1
 
 -- add by wss 
 -- 设置一个默认的银行密码
-yl.DEFAULT_PASSWORD = ""
+yl.DEFAULT_PASSWORD = "123456"     -- 这个值在clientScene中设置
 
 --测试
 yl.LOGONSERVER							= "61.160.247.37" --@login_ip

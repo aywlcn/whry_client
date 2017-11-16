@@ -204,6 +204,14 @@ function ClientScene:onCreate()
 	self.m_actStartBtnAni = nil
 	self.m_actChargeBtnAni = nil
 		
+    -----初始化银行密码
+    --- 如果和登录密码相同，则再加一个值
+    yl.DEFAULT_PASSWORD = "123456"
+    if string.lower(yl.DEFAULT_PASSWORD) == string.lower(GlobalUserItem.szPassword) then
+        yl.DEFAULT_PASSWORD = yl.DEFAULT_PASSWORD .. "7"
+    end
+    ----------------------------------
+
 	local this = self
 	--保存进入的游戏记录信息
 	GlobalUserItem.m_tabEnterGame = nil
@@ -581,10 +589,12 @@ function ClientScene:onCreate()
 				bRes = true
 			else
 				-- 显示广告
-				if GlobalUserItem.isShowAdNotice() then
-					local webview = appdf.req(appdf.CLIENT_SRC.."plaza.views.layer.plaza.WebViewLayer"):create(self)
-					self:addChild(webview)
-				end
+
+                -- add by wss 不显示公告
+--				if GlobalUserItem.isShowAdNotice() then
+--					local webview = appdf.req(appdf.CLIENT_SRC.."plaza.views.layer.plaza.WebViewLayer"):create(self)
+--					self:addChild(webview)
+--				end
 				self._checkInFrame = nil
 			end
 		elseif result == self._checkInFrame.QUERYMEMBERGIFT then
@@ -597,10 +607,12 @@ function ClientScene:onCreate()
 				self:onChangeShowMode(yl.SCENE_CHECKIN)
 			else
 				-- 显示广告
-				if GlobalUserItem.isShowAdNotice() then
-					local webview = appdf.req(appdf.CLIENT_SRC.."plaza.views.layer.plaza.WebViewLayer"):create(self)
-					self:addChild(webview)
-				end
+
+                -- add by wss 不显示公告
+--				if GlobalUserItem.isShowAdNotice() then
+--					local webview = appdf.req(appdf.CLIENT_SRC.."plaza.views.layer.plaza.WebViewLayer"):create(self)
+--					self:addChild(webview)
+--				end
 			end
 			self._checkInFrame = nil
 		end
@@ -2237,10 +2249,12 @@ function ClientScene:queryTaskInfo()
 						self.m_touchFilter = nil
 					end
 					-- 显示广告
-					if GlobalUserItem.isShowAdNotice() then
-						local webview = appdf.req(appdf.CLIENT_SRC.."plaza.views.layer.plaza.WebViewLayer"):create(self)
-						self:addChild(webview)
-					end
+
+                    -- add by wss 不显示公告
+--					if GlobalUserItem.isShowAdNotice() then
+--						local webview = appdf.req(appdf.CLIENT_SRC.."plaza.views.layer.plaza.WebViewLayer"):create(self)
+--						self:addChild(webview)
+--					end
 				end
 			end
 			self:queryLevelInfo()

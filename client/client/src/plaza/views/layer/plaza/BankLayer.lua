@@ -191,7 +191,7 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
     display.newSprite("Bank/text_bank_password.png")
     	:move(305,210)
     	:addTo(self._takesaveArea)
-        :setVisible(false)
+        --:setVisible(false)
 
     --金额大写提示
     self.m_textNumber = ClipText:createClipText(cc.size(350,24), "", "fonts/round_body.ttf", 24)
@@ -229,7 +229,7 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
 		:addTo(self._takesaveArea)
 
         -- add by wss
-        self.edit_Password:setVisible(false)
+        --self.edit_Password:setVisible(false)
 
 
 	--赠送界面
@@ -248,7 +248,7 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
     display.newSprite("Bank/text_bank_password.png")
     	:move(300,240)
     	:addTo(self._transferArea)
-        :setVisible(false)
+        --:setVisible(false)
 
    	ccui.Button:create("Bank/bt_bank_present_0.png", "Bank/bt_bank_present_1.png")
 		:move(625,117)
@@ -297,7 +297,7 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
 		:addTo(self._transferArea)
 
         -- add by wss
-        self.edit_TransferPassword:setVisible(false)
+        --self.edit_TransferPassword:setVisible(false)
 
 	--其他功能
     self._txtPresentChs = cc.LabelAtlas:_create("", "Bank/bank_num_0.png", 30, 32, string.byte("0")) 
@@ -365,6 +365,8 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
 
         -- 直接设置一个银行密码  
         self:showPopWait()
+
+        
 	    self._bankFrame:onEnableBank(yl.DEFAULT_PASSWORD)
 
     end
@@ -394,10 +396,18 @@ function BankLayer:showBankLayer()
             local vipConfig = GlobalUserItem.MemberList[GlobalUserItem.cbMemberOrder]
             str = str .. vipConfig._name .. "扣除" .. vipConfig._insure .. "‰手续费。"
         end
-        self._notifyTextPresent:setString(str)
+
+        --self._notifyTextPresent:setString(str)
+        --add by wss
+        local str2 = string.format("提示:默认银行密码为:%s" , yl.DEFAULT_PASSWORD)
+        self._notifyTextPresent:setString(str2)
 	else
 		self.m_textNumber:setPosition(930, 330)
-        self._notifyText:setString(str)
+        --self._notifyText:setString(str)
+
+        --add by wss
+        local str2 = string.format("提示:默认银行密码为:%s" , yl.DEFAULT_PASSWORD)
+        self._notifyText:setString(str2)
 	end        
 end
 
@@ -571,10 +581,18 @@ function BankLayer:onSelectedEvent(sender,eventType)
                 local vipConfig = GlobalUserItem.MemberList[GlobalUserItem.cbMemberOrder]
                 str = str .. vipConfig._name .. "扣除" .. vipConfig._insure .. "‰手续费。"
             end
-            self._notifyTextPresent:setString(str)
+            --self._notifyTextPresent:setString(str)
+
+            --add by wss
+            local str2 = string.format("提示:默认银行密码为:%s" , yl.DEFAULT_PASSWORD)
+            self._notifyTextPresent:setString(str2)
 		else
 			self.m_textNumber:setPosition(930, 330)
-            self._notifyText:setString(str)
+            --self._notifyText:setString(str)
+
+            --add by wss
+            local str2 = string.format("提示:默认银行密码为:%s" , yl.DEFAULT_PASSWORD)
+            self._notifyText:setString(str2)
 		end        
 	elseif tag == BankLayer.CBT_BY_ID or tag == BankLayer.CBT_BY_NAME then
 		local byID = (tag == BankLayer.CBT_BY_ID)
@@ -678,8 +696,8 @@ function BankLayer:onTakeScore()
 
 	self:showPopWait()
     -- add by wss , 用默认的密码
-	-- self._bankFrame:onTakeScore(lOperateScore,szPass)
-    self._bankFrame:onTakeScore(lOperateScore,yl.DEFAULT_PASSWORD)
+	self._bankFrame:onTakeScore(lOperateScore,szPass)
+    --self._bankFrame:onTakeScore(lOperateScore,yl.DEFAULT_PASSWORD)
 end
 
 --存款
@@ -753,8 +771,8 @@ function BankLayer:onTransferScore()
 
 	self:showPopWait()
     -- add by wss
-	--self._bankFrame:onTransferScore(lOperateScore,szTarget,szPass,byID)
-    self._bankFrame:onTransferScore(lOperateScore,szTarget,yl.DEFAULT_PASSWORD,byID)
+	self._bankFrame:onTransferScore(lOperateScore,szTarget,szPass,byID)
+    --self._bankFrame:onTransferScore(lOperateScore,szTarget,yl.DEFAULT_PASSWORD,byID)
 
 end
 
@@ -815,6 +833,10 @@ function BankLayer:onBankCallBack(result,message)
 		--取款收费比例
 		local str = string.format("提示:存入游戏币免手续费,取出将扣除%d‰的手续费。", message.wRevenueTake)
         self._notifyText:setString(str)
+
+        --add by wss
+        local str2 = string.format("提示:默认银行密码为:%s" , yl.DEFAULT_PASSWORD)
+        self._notifyText:setString(str2)
 
         self._txtInsure:setString(string.formatNumberThousands(GlobalUserItem.lUserInsure,true,"/"))
         self._txtScore:setString(string.formatNumberThousands(GlobalUserItem.lUserScore,true,"/"))
