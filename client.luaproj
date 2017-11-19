@@ -11757,6 +11757,7 @@
     <Compile Include="client\client\src\plaza\views\layer\plaza\BankRecordLayer.lua" />
     <Compile Include="client\client\src\plaza\views\layer\plaza\BindingLayer.lua" />
     <Compile Include="client\client\src\plaza\views\layer\plaza\BindingRegisterLayer.lua" />
+    <Compile Include="client\client\src\plaza\views\layer\plaza\CardCharge.lua" />
     <Compile Include="client\client\src\plaza\views\layer\plaza\CheckinLayer.lua" />
     <Compile Include="client\client\src\plaza\views\layer\plaza\EveryDayLayer.lua" />
     <Compile Include="client\client\src\plaza\views\layer\plaza\FaqLayer.lua" />

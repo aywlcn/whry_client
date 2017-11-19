@@ -58,6 +58,8 @@ local TableLayer = appdf.req(appdf.CLIENT_SRC .. "plaza.views.layer.plaza.TableL
 
 local FeedbackLayer = appdf.req(appdf.CLIENT_SRC .. "plaza.views.layer.plaza.FeedbackLayer")
 
+local CardChargeLayer = appdf.req(appdf.CLIENT_SRC .. "plaza.views.layer.plaza.CardCharge")
+
 local FaqLayer = appdf.req(appdf.CLIENT_SRC .. "plaza.views.layer.plaza.FaqLayer")
 
 local GameFrameEngine = appdf.req(appdf.CLIENT_SRC.."plaza.models.GameFrameEngine")
@@ -1679,7 +1681,9 @@ function ClientScene:getTagLayer(tag, param )
 	elseif tag == yl.SCENE_TABLE then
 		dst = TableLayer:create(self)
 	elseif tag == yl.SCENE_FEEDBACK then
+        -- test
 		dst = FeedbackLayer:create(self)
+        --dst = CardChargeLayer.create(self)
 	elseif tag == yl.SCENE_FEEDBACKLIST then
 		dst = FeedbackLayer.createFeedbackList(self)
 	elseif tag == yl.SCENE_FAQ then

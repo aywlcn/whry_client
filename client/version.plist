@@ -3,6 +3,8 @@
 
 <plist version="1.0">
     <dict>
+        <key>res_game_118</key>
+        <real>1.0000000000000000</real>
         <key>res_game_200</key>
         <real>1.0000000000000000</real>
         <key>res_game_389</key>
@@ -24,20 +26,18 @@
         <key>res_game_6</key>
         <real>1.0000000000000000</real>
         <key>res_client</key>
-        <real>12.0000000000000000</real>
-        <key>res_game_512</key>
-        <real>1.0000000000000000</real>
-        <key>res_game_123</key>
+        <real>13.0000000000000000</real>
+        <key>res_game_102</key>
         <real>1.0000000000000000</real>
         <key>res_game_27</key>
-        <real>1.0000000000000000</real>
-        <key>res_game_118</key>
         <real>1.0000000000000000</real>
         <key>res_game_238</key>
         <real>1.0000000000000000</real>
         <key>res_game_511</key>
         <real>1.0000000000000000</real>
-        <key>res_game_102</key>
+        <key>res_game_512</key>
+        <real>1.0000000000000000</real>
+        <key>res_game_123</key>
         <real>1.0000000000000000</real>
     </dict>
 </plist>
