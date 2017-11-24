@@ -584,7 +584,7 @@ function ClientScene:onCreate()
 		local bRes = false
 		if result == 1 then
 			if false == GlobalUserItem.bTodayChecked then
-				self:onChangeShowMode(yl.SCENE_CHECKIN)
+				--self:onChangeShowMode(yl.SCENE_CHECKIN)
 				self._checkInFrame = nil
 			elseif GlobalUserItem.cbMemberOrder ~= 0 then
 				self._checkInFrame:sendCheckMemberGift()
@@ -606,7 +606,7 @@ function ClientScene:onCreate()
 		end
 		if nil ~= self._checkInFrame and self._checkInFrame.QUERYMEMBERGIFT == result then
 			if true == subMessage then
-				self:onChangeShowMode(yl.SCENE_CHECKIN)
+				--self:onChangeShowMode(yl.SCENE_CHECKIN)
 			else
 				-- 显示广告
 
@@ -1193,8 +1193,9 @@ function ClientScene:onButtonClickedEvent(tag,ref)
         elseif tag == ClientScene.BT_EMAIL then
             showToast(self, "暂未开放!", 1)
         elseif tag == ClientScene.BT_ACTIVITY then
-            showToast(self, "暂未开放!", 1)
-		elseif tag == ClientScene.BT_TASK then
+            --showToast(self, "暂未开放!", 1)
+		    self:onChangeShowMode(yl.SCENE_CARDCHARGE)
+        elseif tag == ClientScene.BT_TASK then
 			if false == GlobalUserItem.bEnableTask then
 				showToast(self, "当前功能暂未开放,敬请期待!", 2)
 				return
@@ -1204,7 +1205,7 @@ function ClientScene:onButtonClickedEvent(tag,ref)
 		elseif self.cur_Scene == yl.SCENE_BANKRECORD then
 			self:onChangeShowMode(yl.SCENE_BANK)
 		elseif tag == ClientScene.BT_CHECKIN then
-			self:onChangeShowMode(yl.SCENE_CHECKIN)
+			--self:onChangeShowMode(yl.SCENE_CHECKIN)
 		elseif tag == ClientScene.BT_RECHARGE then
 			self:onChangeShowMode(yl.SCENE_SHOP, Shop.CBT_ENTITY)
 		elseif tag == ClientScene.BT_EXCHANGE then
@@ -1683,7 +1684,8 @@ function ClientScene:getTagLayer(tag, param )
 	elseif tag == yl.SCENE_FEEDBACK then
         -- test
 		dst = FeedbackLayer:create(self)
-        --dst = CardChargeLayer.create(self)
+    elseif tag == yl.SCENE_CARDCHARGE then
+        dst = CardChargeLayer:create(self)
 	elseif tag == yl.SCENE_FEEDBACKLIST then
 		dst = FeedbackLayer.createFeedbackList(self)
 	elseif tag == yl.SCENE_FAQ then

@@ -85,6 +85,8 @@ yl.SCENE_FEEDBACKLIST				 	= 32		--反馈列表
 yl.SCENE_FAQ							= 33		--常见问题
 yl.SCENE_BINDINGREG						= 34		--绑定注册
 
+yl.SCENE_CARDCHARGE                     = 35
+
 yl.SCENE_EX_END 						= 50
 
 yl.MAIN_SOCKET_INFO						= 0

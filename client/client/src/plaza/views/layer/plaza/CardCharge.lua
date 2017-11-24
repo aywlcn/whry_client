@@ -64,6 +64,9 @@ function CardChargeLayer:ctor( scene )
     local btn = csbNode:getChildByName("btn_back")
     btn:setTag(BT_EXIT)
     btn:addTouchEventListener(btncallback)
+
+    csbNode:getChildByName("sp_modify_title_3"):setVisible(false)
+
     --[[
     --图片选择
     btn = csbNode:getChildByName("btn_pickimg")
@@ -97,7 +100,8 @@ function CardChargeLayer:ctor( scene )
 	    self.m_webView:setContentSize(cc.size(1260, 580))
 	    
 	    self.m_webView:setScalesPageToFit(true)
-	    local url = yl.HTTP_URL .. "/SyncLogin.aspx?userid=" .. GlobalUserItem.dwUserID .. "&time=".. os.time() .. "&signature="..GlobalUserItem:getSignature(os.time()).."&url=/Pay/PayCardFill.aspx"
+	    --local url = yl.HTTP_URL .. "/Pay/PayCardFill.aspx"
+        local url = yl.HTTP_URL .. "/SyncLogin.aspx?userid=" .. GlobalUserItem.dwUserID .. "&time=".. os.time() .. "&signature="..GlobalUserItem:getSignature(os.time()).."&url=/Pay/PayCardFill.aspx"
 	    self.m_webView:loadURL(url)
         ExternalFun.visibleWebView(self.m_webView, false)
 	    self._scene:showPopWait()
