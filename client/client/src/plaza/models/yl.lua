@@ -34,7 +34,7 @@ yl.LOGONPORT							= 8600 --@login_port
 --yl.FRIENDPORT							= 8630 --@friend_port
 yl.FRIENDPORT							= 8630 --@friend_port
 --编译码
-yl.VALIDATE 							= "B3D44854-9C2F-4C78-807F-8C08E940166D" --@compilation
+yl.VALIDATE 							= "E4954CD9-7089-4F7D-85F6-7B6EA082312E" --@compilation
 
 --http请求链接地址
 --yl.HTTP_URL								= "http://ry.webfox.com" --@http_url
