@@ -74,6 +74,7 @@ function GameListLayer:ctor(gamelist)
         [122] = 8,
         [123] = 9,
         [140] = 9,
+        [502] = 9,
         [503] = 9,
         [508] = 10,
         [510] = 8,
