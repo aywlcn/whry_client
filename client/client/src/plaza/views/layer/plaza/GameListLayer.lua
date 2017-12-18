@@ -460,7 +460,9 @@ function GameListLayer.tableCellAtIndex(view, idx)
             acSprite2:setPosition( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight2 )
             acSprite2:addTo(cell)
             acSprite2:setName("acSprite2")
-            acSprite2:runAction( menuBtnAnimationVec[tonumber(gameinfo2._KindID)] )  -- 
+            if gameinfo2 then
+                acSprite2:runAction( menuBtnAnimationVec[tonumber(gameinfo2._KindID)] )  -- 
+            end
 
 		    local maskSp2 = cc.Sprite:create(filestr2)
 		    local pos = cc.p(0,0)
@@ -484,11 +486,13 @@ function GameListLayer.tableCellAtIndex(view, idx)
                 --mask2:setVisible(false)
                 -- add by wss
                 local app = view:getParent():getParent():getParent():getApp()
-	            local version = tonumber(app:getVersionMgr():getResVersion(gameinfo2._KindID))
-	            if not version or gameinfo2._ServerResVersion > version then
-		            mask2:setVisible(true)
-	            else
-		            mask2:setVisible(false)
+                if gameinfo2 then
+	                local version = tonumber(app:getVersionMgr():getResVersion(gameinfo2._KindID))
+	                if not version or gameinfo2._ServerResVersion > version then
+		                mask2:setVisible(true)
+	                else
+		                mask2:setVisible(false)
+                    end
                 end
 
 			    spTip = cc.Label:createWithTTF("", "fonts/round_body.ttf", 32)
@@ -609,6 +613,7 @@ function GameListLayer.tableCellAtIndex(view, idx)
                 local acSprite2 = cell:getChildByName("acSprite2")
                 acSprite2:stopAllActions()
                 acSprite2:runAction( menuBtnAnimationVec[tonumber(gameinfo2._KindID)] )
+                acSprite2:setVisible(true)
 
 		        mask2 = cell:getChildByName("download_mask2")
 		        if nil ~= mask2 then
@@ -637,7 +642,9 @@ function GameListLayer.tableCellAtIndex(view, idx)
             else
                 game2 = cell:getChildByTag(2)
                 game2:loadTexture (defaultPng)
-                
+                local acSprite2 = cell:getChildByName("acSprite2")
+                --acSprite2:stopAllActions()
+                acSprite2:setVisible(false)
             end
 	    end	
 
