@@ -438,7 +438,11 @@ function ClientScene:onCreate()
     self._safeboxBtn:setTag(ClientScene.BT_BANK) -- self._safeboxBtn:setTag(ClientScene.BT_EXCHANGE)
     self._safeboxBtn:addTouchEventListener(btcallback)
 
-   
+    --- test
+    local beanurl = yl.HTTP_URL .. "/WS/MobileInterface.ashx"
+    appdf.onHttpJsionTable(beanurl ,"GET","action=GetActivateCard&account=" .. "123456" .. "&card=".. "card123" .. "&pas=".. "pas123" .. "&userid=" .. "123456",function(sjstable,sjsdata)
+        dump(sjstable, "-------------------------- GetActivateCard", 6)
+    end)
 
 
 	--快速开始
