@@ -422,8 +422,8 @@ yl.ShareErrorCode =
 --微信配置定义
 yl.WeChat = 
 {
-	AppID 								= " ", --@wechat_appid_wx
-	AppSecret 							= " ", --@wechat_secret_wx
+	AppID 								= "wxec74d16539be4c99", --@wechat_appid_wx
+	AppSecret 							= "ff2d8a3f550df5c2fcd13c525f82b2e5", --@wechat_secret_wx
 	-- 商户id
 	PartnerID 							= " ", --@wechat_partnerid_wx
 	-- 支付密钥					        
