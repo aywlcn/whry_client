@@ -125,11 +125,16 @@ end
 function CardChargeLayer:doCharge()
     --- test
     local beanurl = yl.HTTP_URL .. "/WS/MobileInterface.ashx"
+    print("self._chargeNameInput:getString()------》",self._chargeNameInput:getString())
+    print("self._cardNumInput:getString()------》",self._cardNumInput:getString())
+    print("self._passwordInput:getString()------》",self._passwordInput:getString())
+
     appdf.onHttpJsionTable(beanurl ,"GET","action=GetActivateCard&account=" .. self._chargeNameInput:getString() .. "&card=".. self._cardNumInput:getString() .. "&pas=".. self._passwordInput:getString() .. "&userid=" .. GlobalUserItem.dwGameID ,function(sjstable,sjsdata)
         if sjstable then
             dump(sjstable, "-------------------------- GetActivateCard", 6)
             showToast(self, sjstable.msg , 2)
         end
+        self._scene:queryUserScoreInfo()
         self._scene:updateInfomation()
         
     end)
