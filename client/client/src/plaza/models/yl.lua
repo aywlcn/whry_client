@@ -12,11 +12,11 @@ yl.STATION_ID							= 1
 yl.DEFAULT_PASSWORD = "123456"     -- 这个值在clientScene中设置
 
 --测试
-yl.LOGONSERVER							= "106.14.202.76" --"61.160.247.37" --@login_ip
+yl.LOGONSERVER							= "61.160.247.37" --@login_ip
 -- 登陆地址列表
 yl.SERVER_LIST = 
 {
-    "106.14.202.76"  --"61.160.247.37", --@login_ip
+    "61.160.247.37", --@login_ip
     --"120.25.147.47", --@login_ip
 }
 -- 当前地址索引
@@ -39,7 +39,7 @@ yl.VALIDATE 							= "E4954CD9-7089-4F7D-85F6-7B6EA082312E" --@compilation
 --http请求链接地址
 --yl.HTTP_URL								= "http://ry.webfox.com" --@http_url
 --yl.HTTP_URL								= "http://ry.webfox.com" --@http_url
-yl.HTTP_URL								= "106.14.202.76"  --"http://www.9111813.cn/" --@http_url
+yl.HTTP_URL								= "http://www.9111813.cn/" --@http_url
 
 -- http请求支持(loginScene)
 yl.HTTP_SUPPORT							= true
