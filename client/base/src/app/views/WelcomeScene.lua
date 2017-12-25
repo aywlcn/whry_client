@@ -50,6 +50,7 @@ function WelcomeScene:onCreate()
 	end
 	if nil ~= sp then
 		sp:setPosition(appdf.WIDTH/2,appdf.HEIGHT/2+100)
+        sp:setScale(1.5)
 		self:addChild(sp)
 		sp:runAction(cc.RepeatForever:create(cc.Sequence:create(cc.FadeTo:create(2,255),cc.FadeTo:create(2,128))))
 	end

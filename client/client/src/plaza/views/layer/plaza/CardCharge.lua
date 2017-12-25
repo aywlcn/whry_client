@@ -85,7 +85,7 @@ function CardChargeLayer:ctor( scene )
 --		self:onEditEvent(name, sender)
 --	end
 
-    local chargeNameInput = ccui.EditBox:create(cc.size(self._chargeNameInput:getContentSize().width  ,self._chargeNameInput:getContentSize().heigth), ccui.Scale9Sprite:create("Logon/text_field_frame.png"))
+    local chargeNameInput = ccui.EditBox:create(cc.size(490,67), ccui.Scale9Sprite:create("Logon/text_field_frame.png"))
 		:move(self._chargeNameInput:getPositionX() ,self._chargeNameInput:getPositionY())
 		:setAnchorPoint(cc.p(0.5,0.5))
 		:setFontName("fonts/round_body.ttf")
@@ -94,13 +94,16 @@ function CardChargeLayer:ctor( scene )
 		:setPlaceholderFontSize(40)
 		:setMaxLength(31)
 		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)		
+        :setPlaceHolder(self._chargeNameInput:getPlaceHolder())
+        :setPlaceholderFontColor(self._chargeNameInput:getPlaceHolderColor())
 		:addTo(self._chargeNameInput:getParent(),10)
+        
 
     self._chargeNameInput:removeFromParent()
     self._chargeNameInput = chargeNameInput
 	--self.edit_Account:registerScriptEditBoxHandler(editHanlder)
 
-    local cardNumInput = ccui.EditBox:create(cc.size(self._cardNumInput:getContentSize().width  ,self._cardNumInput:getContentSize().heigth), ccui.Scale9Sprite:create("Logon/text_field_frame.png"))
+    local cardNumInput = ccui.EditBox:create(cc.size(490,67), ccui.Scale9Sprite:create("Logon/text_field_frame.png"))
 		:move(self._cardNumInput:getPositionX() ,self._cardNumInput:getPositionY())
 		:setAnchorPoint(cc.p(0.5,0.5))
 		:setFontName("fonts/round_body.ttf")
@@ -109,12 +112,14 @@ function CardChargeLayer:ctor( scene )
 		:setPlaceholderFontSize(40)
 		:setMaxLength(31)
 		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)		
+        :setPlaceHolder(self._cardNumInput:getPlaceHolder())
+        :setPlaceholderFontColor(self._cardNumInput:getPlaceHolderColor())
 		:addTo(self._cardNumInput:getParent(),10)
 
     self._cardNumInput:removeFromParent()
     self._cardNumInput = cardNumInput
 
-    local passwordInput = ccui.EditBox:create(cc.size(self._passwordInput:getContentSize().width  ,self._passwordInput:getContentSize().heigth), ccui.Scale9Sprite:create("Logon/text_field_frame.png"))
+    local passwordInput = ccui.EditBox:create(cc.size(490,67), ccui.Scale9Sprite:create("Logon/text_field_frame.png"))
 		:move(self._passwordInput:getPositionX() ,self._passwordInput:getPositionY())
 		:setAnchorPoint(cc.p(0.5,0.5))
 		:setFontName("fonts/round_body.ttf")
@@ -123,7 +128,10 @@ function CardChargeLayer:ctor( scene )
 		:setPlaceholderFontSize(40)
 		:setMaxLength(31)
 		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)		
+        :setPlaceHolder(self._passwordInput:getPlaceHolder())
+        :setPlaceholderFontColor(self._passwordInput:getPlaceHolderColor())
 		:addTo(self._passwordInput:getParent(),10)
+
     self._passwordInput:removeFromParent()
     self._passwordInput = passwordInput
 
