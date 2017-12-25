@@ -70,6 +70,10 @@ function CardChargeLayer:ctor( scene )
 
     csbNode:getChildByName("sp_modify_title_3"):setVisible(false)
 
+    getChildFormObject(csbNode , "nameInputPanel"):setVisible(false)
+    getChildFormObject(csbNode , "cardNumInputPanel"):setVisible(false)
+    getChildFormObject(csbNode , "passwardInputPanel"):setVisible(false)
+
     -- 充值账号
     self._chargeNameInput = getChildFormObject(csbNode , "nameInputValue") 
     -- 点卡卡号
@@ -77,7 +81,54 @@ function CardChargeLayer:ctor( scene )
     -- 点卡密码
     self._passwordInput = getChildFormObject(csbNode , "passwardInputValue") 
 
-    self._chargeNameInput:setString( GlobalUserItem.szNickName )
+--    local editHanlder = function ( name, sender )
+--		self:onEditEvent(name, sender)
+--	end
+
+    local chargeNameInput = ccui.EditBox:create(cc.size(self._chargeNameInput:getContentSize().width  ,self._chargeNameInput:getContentSize().heigth), ccui.Scale9Sprite:create("Logon/text_field_frame.png"))
+		:move(self._chargeNameInput:getPositionX() ,self._chargeNameInput:getPositionY())
+		:setAnchorPoint(cc.p(0.5,0.5))
+		:setFontName("fonts/round_body.ttf")
+		:setPlaceholderFontName("fonts/round_body.ttf")
+		:setFontSize(40)
+		:setPlaceholderFontSize(40)
+		:setMaxLength(31)
+		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)		
+		:addTo(self._chargeNameInput:getParent(),10)
+
+    self._chargeNameInput:removeFromParent()
+    self._chargeNameInput = chargeNameInput
+	--self.edit_Account:registerScriptEditBoxHandler(editHanlder)
+
+    local cardNumInput = ccui.EditBox:create(cc.size(self._cardNumInput:getContentSize().width  ,self._cardNumInput:getContentSize().heigth), ccui.Scale9Sprite:create("Logon/text_field_frame.png"))
+		:move(self._cardNumInput:getPositionX() ,self._cardNumInput:getPositionY())
+		:setAnchorPoint(cc.p(0.5,0.5))
+		:setFontName("fonts/round_body.ttf")
+		:setPlaceholderFontName("fonts/round_body.ttf")
+		:setFontSize(40)
+		:setPlaceholderFontSize(40)
+		:setMaxLength(31)
+		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)		
+		:addTo(self._cardNumInput:getParent(),10)
+
+    self._cardNumInput:removeFromParent()
+    self._cardNumInput = cardNumInput
+
+    local passwordInput = ccui.EditBox:create(cc.size(self._passwordInput:getContentSize().width  ,self._passwordInput:getContentSize().heigth), ccui.Scale9Sprite:create("Logon/text_field_frame.png"))
+		:move(self._passwordInput:getPositionX() ,self._passwordInput:getPositionY())
+		:setAnchorPoint(cc.p(0.5,0.5))
+		:setFontName("fonts/round_body.ttf")
+		:setPlaceholderFontName("fonts/round_body.ttf")
+		:setFontSize(40)
+		:setPlaceholderFontSize(40)
+		:setMaxLength(31)
+		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)		
+		:addTo(self._passwordInput:getParent(),10)
+    self._passwordInput:removeFromParent()
+    self._passwordInput = passwordInput
+
+
+    self._chargeNameInput:setText( GlobalUserItem.szNickName )
     
     -- 充值按钮
     self._chargeBtn = getChildFormObject(csbNode , "chargeButton") 
@@ -125,14 +176,14 @@ end
 function CardChargeLayer:doCharge()
     --- test
     local beanurl = yl.HTTP_URL .. "/WS/MobileInterface.ashx"
-    print("self._chargeNameInput:getString()------》",self._chargeNameInput:getString())
-    print("self._cardNumInput:getString()------》",self._cardNumInput:getString())
-    print("self._passwordInput:getString()------》",self._passwordInput:getString())
+    --print("self._chargeNameInput:getString()------》",self._chargeNameInput:getText())
+    --print("self._cardNumInput:getString()------》",self._cardNumInput:getText())
+    --print("self._passwordInput:getString()------》",self._passwordInput:getText())
 
-    appdf.onHttpJsionTable(beanurl ,"GET","action=GetActivateCard&account=" .. self._chargeNameInput:getString() .. "&card=".. self._cardNumInput:getString() .. "&pas=".. self._passwordInput:getString() .. "&userid=" .. GlobalUserItem.dwGameID ,function(sjstable,sjsdata)
+    appdf.onHttpJsionTable(beanurl ,"GET","action=GetActivateCard&account=" .. self._chargeNameInput:getText() .. "&card=".. self._cardNumInput:getText() .. "&pas=".. self._passwordInput:getText() .. "&userid=" .. GlobalUserItem.dwGameID ,function(sjstable,sjsdata)
         if sjstable then
-            dump(sjstable, "-------------------------- GetActivateCard", 6)
-            showToast(self, sjstable.msg , 2)
+            --dump(sjstable, "-------------------------- GetActivateCard", 6)
+            showToast(self, sjstable.msg , 3)
         end
         self._scene:queryUserScoreInfo()
         self._scene:updateInfomation()
