@@ -512,7 +512,9 @@ function GameListLayer.tableCellAtIndex(view, idx)
 		    end	
             
             -- 2 touch event
-            game2:setTouchEnabled(true)
+            if gameinfo2 then
+                game2:setTouchEnabled(true)
+            end
             game2:setSwallowTouches(false)
             game2:addTouchEventListener(function(ref, tType)
                 if tType == ccui.TouchEventType.began then
@@ -609,6 +611,8 @@ function GameListLayer.tableCellAtIndex(view, idx)
             if isHaveEndSecondHSpace then
                 game2 = cell:getChildByTag(2)
 		        game2:loadTexture (filestr2)
+                game2:setVisible(true)
+                game2:setTouchEnabled(true)
 
                 local acSprite2 = cell:getChildByName("acSprite2")
                 acSprite2:stopAllActions()
@@ -642,6 +646,8 @@ function GameListLayer.tableCellAtIndex(view, idx)
             else
                 game2 = cell:getChildByTag(2)
                 game2:loadTexture (defaultPng)
+                game2:setVisible(false)
+                game2:setTouchEnabled(false)
                 local acSprite2 = cell:getChildByName("acSprite2")
                 --acSprite2:stopAllActions()
                 acSprite2:setVisible(false)

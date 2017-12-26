@@ -78,6 +78,9 @@ function WelcomeScene:onCreate()
 		:move(appdf.WIDTH,0)
 		:addTo(self)
 
+    -- add by wss
+    self._txtTips:setVisible(false)
+
 	self.m_progressLayer = display.newLayer(cc.c4b(0, 0, 0, 0))
 	self:addChild(self.m_progressLayer)
 	self.m_progressLayer:setVisible(false)
