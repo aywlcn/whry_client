@@ -493,6 +493,8 @@ function GameListLayer.tableCellAtIndex(view, idx)
 	                else
 		                mask2:setVisible(false)
                     end
+                else
+                    mask2:setVisible(false)
                 end
 
 			    spTip = cc.Label:createWithTTF("", "fonts/round_body.ttf", 32)
@@ -514,6 +516,10 @@ function GameListLayer.tableCellAtIndex(view, idx)
             -- 2 touch event
             if gameinfo2 then
                 game2:setTouchEnabled(true)
+                game2:setVisible(true)
+            else
+                game2:setTouchEnabled(false)
+                game2:setVisible(false)
             end
             game2:setSwallowTouches(false)
             game2:addTouchEventListener(function(ref, tType)
@@ -651,6 +657,9 @@ function GameListLayer.tableCellAtIndex(view, idx)
                 local acSprite2 = cell:getChildByName("acSprite2")
                 --acSprite2:stopAllActions()
                 acSprite2:setVisible(false)
+
+                mask2 = cell:getChildByName("download_mask2")
+                mask2:setVisible(false)
             end
 	    end	
 
