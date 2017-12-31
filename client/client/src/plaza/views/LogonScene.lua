@@ -145,24 +145,24 @@ function LogonScene:onCreate()
 		:addTo(self)
 
 	--背景
-    display.newSprite("background_1.jpg")
+    self._bg = display.newSprite("background_1.png")
         :move(yl.WIDTH/2,yl.HEIGHT/2)
         :addTo(self._backLayer)
  
  	--平台logo
-	display.newSprite("Logon/logon_logo.png")
-		:move(yl.WIDTH/2,yl.HEIGHT-150)
-		:addTo(self._backLayer)
-		:runAction(cc.MoveTo:create(0.3,cc.p(yl.WIDTH/2,yl.HEIGHT-150)))
+--	display.newSprite("Logon/logon_logo.png")
+--		:move(yl.WIDTH/2,yl.HEIGHT-150)
+--		:addTo(self._backLayer)
+--		:runAction(cc.MoveTo:create(0.3,cc.p(yl.WIDTH/2,yl.HEIGHT-150)))
 
 	--返回
-	if  device.platform ~= "mac" and device.platform ~= "ios" then
-		ccui.Button:create("bt_return_0.png","bt_return_1.png")
-			:move(75,yl.HEIGHT-51)
-			:setTag(LogonScene.BT_EXIT)
-			:addTo(self._backLayer)
-			:addTouchEventListener(btcallback)
-	end
+--	if  device.platform ~= "mac" and device.platform ~= "ios" then
+--		ccui.Button:create("bt_return_0.png","bt_return_1.png")
+--			:move(75,yl.HEIGHT-51)
+--			:setTag(LogonScene.BT_EXIT)
+--			:addTo(self._backLayer)
+--			:addTouchEventListener(btcallback)
+--	end
 
 	self._txtTips = cc.Label:createWithTTF("同步服务器信息中...", "fonts/round_body.ttf", 24)
 		:setTextColor(cc.c4b(0,250,0,255))
@@ -181,10 +181,12 @@ function LogonScene:onCreate()
 	-- 激活房卡
 	GlobalUserItem.bEnableRoomCard = (self:getApp()._serverConfig["isOpenCard"] == 0)
 	--创建登录界面
-	self._logonView = LogonView:create(self:getApp()._serverConfig)
+	self._logonView = LogonView:create(self:getApp()._serverConfig , self )
 		:move(0,0)
 		:addTo(self._backLayer)
 end
+
+
 
 --按钮事件
 function LogonScene:onButtonClickedEvent(tag,ref)

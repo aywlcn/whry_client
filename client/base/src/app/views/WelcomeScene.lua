@@ -29,10 +29,10 @@ function WelcomeScene:onCreate()
 
 	--背景
 	local newbasepath = cc.FileUtils:getInstance():getWritablePath() .. "/baseupdate/"
-	local bgfile = newbasepath .. "base/res/background.jpg"	
+	local bgfile = newbasepath .. "base/res/background_1.png"	
 	local sp = cc.Sprite:create(bgfile)
 	if nil == sp then
-		sp = cc.Sprite:create("background.jpg")
+		sp = cc.Sprite:create("background_1.png")
 	end
 	if nil ~= sp then
 		sp:setPosition(appdf.WIDTH/2,appdf.HEIGHT/2)
@@ -51,6 +51,7 @@ function WelcomeScene:onCreate()
 	if nil ~= sp then
 		sp:setPosition(appdf.WIDTH/2,appdf.HEIGHT/2+100)
         sp:setScale(1.5)
+        sp:setVisible(false)
 		self:addChild(sp)
 		sp:runAction(cc.RepeatForever:create(cc.Sequence:create(cc.FadeTo:create(2,255),cc.FadeTo:create(2,128))))
 	end
@@ -67,6 +68,7 @@ function WelcomeScene:onCreate()
 	if nil ~= sp then
 		sp = cc.Sprite:create(sloganfile)
 		sp:setPosition(appdf.WIDTH/2, 200)
+        sp:setVisible(false)
 		self:addChild(sp)
 	end
 

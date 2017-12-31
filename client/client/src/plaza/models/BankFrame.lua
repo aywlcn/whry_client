@@ -320,7 +320,9 @@ function BankFrame:onSaveScore(lScore)
 		if not self._gameFrame:sendSocketData(buffer) then
 			self._callBack(-1,"发送存款失败！")
 		end
+        print("----------------- onSaveScore  _gameFrame +++++++++++++++++++++++++++++++++++++++++++")
 	else
+        print("----------------- onSaveScore not _gameFrame----------------------------------------")
 		--参数记录
 		self._lOperateScore = lScore
 		if not self:onCreateSocket(yl.LOGONSERVER,yl.LOGONPORT) and nil ~= self._callBack then
@@ -342,7 +344,10 @@ function BankFrame:onTakeScore(lScore,szPassword)
 		if not self._gameFrame:sendSocketData(buffer) then
 			self._callBack(-1,"发送取款失败！")
 		end
+
+        print("----------------- onTakeScore  _gameFrame +++++++++++++++++++++++++++++++++++++++++++")
 	else
+        print("----------------- onTakeScore not _gameFrame----------------------------------------")
 		--参数记录
 		self._lOperateScore = lScore
 		self._szPassword = szPassword

@@ -16,10 +16,12 @@ LogonView.BT_THIRDPARTY	= 8
 LogonView.BT_WECHAT	= 9
 LogonView.BT_FGPW = 10 	-- 忘记密码
 
-function LogonView:ctor(serverConfig)
+LogonView.BT_ACCOUNTLOGON = 11
+
+function LogonView:ctor(serverConfig , scene)
 	local this = self
 	self:setContentSize(yl.WIDTH,yl.HEIGHT)
-	--ExternalFun.registerTouchEvent(self)
+	ExternalFun.registerTouchEvent(self)
 
 	local  btcallback = function(ref, type)
         if type == ccui.TouchEventType.ended then
@@ -34,55 +36,57 @@ function LogonView:ctor(serverConfig)
 		self:onEditEvent(name, sender)
 	end
 
-	--帐号提示
-	display.newSprite("Logon/account_text.png")
-		:move(366,381)
-		:addTo(self)
+    self._scene = scene
 
-	--账号输入
-	self.edit_Account = ccui.EditBox:create(cc.size(490,67), ccui.Scale9Sprite:create("Logon/text_field_frame.png"))
-		:move(yl.WIDTH/2,381)
-		:setAnchorPoint(cc.p(0.5,0.5))
-		:setFontName("fonts/round_body.ttf")
-		:setPlaceholderFontName("fonts/round_body.ttf")
-		:setFontSize(24)
-		:setPlaceholderFontSize(24)
-		:setMaxLength(31)
-		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)		
-		:addTo(self)
-	self.edit_Account:registerScriptEditBoxHandler(editHanlder)
+--	--帐号提示
+--	display.newSprite("Logon/account_text.png")
+--		:move(366,381)
+--		:addTo(self)
 
-	--密码提示
-	display.newSprite("Logon/password_text.png")
-		:move(366,280)
-		:addTo(self)
+--	--账号输入
+--	self.edit_Account = ccui.EditBox:create(cc.size(490,67), ccui.Scale9Sprite:create("Logon/text_field_frame.png"))
+--		:move(yl.WIDTH/2,381)
+--		:setAnchorPoint(cc.p(0.5,0.5))
+--		:setFontName("fonts/round_body.ttf")
+--		:setPlaceholderFontName("fonts/round_body.ttf")
+--		:setFontSize(24)
+--		:setPlaceholderFontSize(24)
+--		:setMaxLength(31)
+--		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)		
+--		:addTo(self)
+--	self.edit_Account:registerScriptEditBoxHandler(editHanlder)
 
-	--密码输入	
-	self.edit_Password = ccui.EditBox:create(cc.size(490,67), ccui.Scale9Sprite:create("Logon/text_field_frame.png"))
-		:move(yl.WIDTH/2,280)
-		:setAnchorPoint(cc.p(0.5,0.5))
-		:setFontName("fonts/round_body.ttf")
-		:setPlaceholderFontName("fonts/round_body.ttf")
-		:setFontSize(24)
-		:setPlaceholderFontSize(24)
-		:setMaxLength(26)
-		:setInputFlag(cc.EDITBOX_INPUT_FLAG_PASSWORD)
-		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)		
-		:addTo(self)
+--	--密码提示
+--	display.newSprite("Logon/password_text.png")
+--		:move(366,280)
+--		:addTo(self)
 
-	-- 忘记密码
-	ccui.Button:create("Logon/btn_login_fgpw.png")
-		:setTag(LogonView.BT_FGPW)
-		:move(1000,280)
-		:addTo(self)
-		:addTouchEventListener(btcallback)
+--	--密码输入	
+--	self.edit_Password = ccui.EditBox:create(cc.size(490,67), ccui.Scale9Sprite:create("Logon/text_field_frame.png"))
+--		:move(yl.WIDTH/2,280)
+--		:setAnchorPoint(cc.p(0.5,0.5))
+--		:setFontName("fonts/round_body.ttf")
+--		:setPlaceholderFontName("fonts/round_body.ttf")
+--		:setFontSize(24)
+--		:setPlaceholderFontSize(24)
+--		:setMaxLength(26)
+--		:setInputFlag(cc.EDITBOX_INPUT_FLAG_PASSWORD)
+--		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)		
+--		:addTo(self)
 
-	--记住密码
-	self.cbt_Record = ccui.CheckBox:create("Logon/rem_password_button.png","","Logon/choose_button.png","","")
-		:move(515,165)
-		:setSelected(GlobalUserItem.bSavePassword)
-		:setTag(LogonView.CBT_RECORD)
-		:addTo(self)
+--	-- 忘记密码
+--	ccui.Button:create("Logon/btn_login_fgpw.png")
+--		:setTag(LogonView.BT_FGPW)
+--		:move(1000,280)
+--		:addTo(self)
+--		:addTouchEventListener(btcallback)
+
+--	--记住密码
+--	self.cbt_Record = ccui.CheckBox:create("Logon/rem_password_button.png","","Logon/choose_button.png","","")
+--		:move(515,165)
+--		:setSelected(GlobalUserItem.bSavePassword)
+--		:setTag(LogonView.CBT_RECORD)
+--		:addTo(self)
 
 	-- --自动登录
 	-- self.cbt_Auto = ccui.CheckBox:create("cbt_auto_0.png","","cbt_auto_1.png","","")
@@ -92,22 +96,17 @@ function LogonView:ctor(serverConfig)
 	-- 	:addTo(self)
 
 	--账号登录
-	ccui.Button:create("Logon/logon_button_0.png", "Logon/logon_button_1.png", "Logon/logon_button_2.png")
+	self._accountLogonBtn = ccui.Button:create("Logon/logon_button_0_1.png", "Logon/logon_button_0_2.png", "Logon/logon_button_0_2.png")
 		:setTag(LogonView.BT_LOGON)
 		:move(cc.p(0,0))
 		:setName("btn_1")
 		:addTo(self)
 		:addTouchEventListener(btcallback)
 
-	--注册按钮
-	ccui.Button:create("Logon/regist_button.png","")
-		:setTag(LogonView.BT_REGISTER)
-		:move(766,165)
-		:addTo(self)
-		:addTouchEventListener(btcallback)
+	
 
 	--游客登录
-	ccui.Button:create("Logon/visitor_button_0.png", "Logon/visitor_button_1.png", "Logon/visitor_button_2.png")
+	self._visitorLogonBtn = ccui.Button:create("Logon/visitor_button_0_1.png", "Logon/visitor_button_0_2.png", "Logon/visitor_button_0_2.png")
 		:setTag(LogonView.BT_VISITOR)
 		:move(cc.p(0,0))
 		:setEnabled(false)
@@ -117,7 +116,7 @@ function LogonView:ctor(serverConfig)
 		:addTouchEventListener(btcallback)
 
 	--微信登陆
-	ccui.Button:create("Logon/thrid_part_wx_0.png", "Logon/thrid_part_wx_1.png", "Logon/thrid_part_wx_2.png")
+	self._wxLogonBtn = ccui.Button:create("Logon/thrid_part_wx_0_1.png", "Logon/thrid_part_wx_0_2.png", "Logon/thrid_part_wx_0_2.png")
 		:setTag(LogonView.BT_WECHAT)
 		:move(cc.p(0,0))
 		:setVisible(false)
@@ -126,9 +125,119 @@ function LogonView:ctor(serverConfig)
 		:addTo(self)
 		:addTouchEventListener(btcallback)
 
+    self._isShowAccountLogonPanel = false
+
+    ---------------------------- 账号登录界面 ------------------------------
+    self._accountLogonPanel = cc.Sprite:create("Logon/accountLogonBg.png")
+    self._accountLogonPanel:setPosition(cc.p(display.cx , display.cy))
+    self._accountLogonPanel:addTo(self)
+    self._accountLogonPanel:setVisible(false)
+
+    local xPosOffset = -270
+    --帐号提示
+	display.newSprite("Logon/account_text.png")
+		:move(366+xPosOffset,381)
+		:addTo(self._accountLogonPanel)
+
+	--账号输入
+	self.edit_Account = ccui.EditBox:create(cc.size(490,67), ccui.Scale9Sprite:create("Logon/text_field_frame2.png"))
+		:move(yl.WIDTH/2+30+xPosOffset,381)
+		:setAnchorPoint(cc.p(0.5,0.5))
+		:setFontName("fonts/round_body.ttf")
+		:setPlaceholderFontName("fonts/round_body.ttf")
+		:setFontSize(24)
+		:setPlaceholderFontSize(24)
+        :setFontColor(cc.c3b(0,0,0))
+		:setMaxLength(31)
+		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)		
+		:addTo(self._accountLogonPanel)
+	self.edit_Account:registerScriptEditBoxHandler(editHanlder)
+
+	--密码提示
+	display.newSprite("Logon/password_text.png")
+		:move(366+xPosOffset,280)
+		:addTo(self._accountLogonPanel)
+
+	--密码输入	
+	self.edit_Password = ccui.EditBox:create(cc.size(490,67), ccui.Scale9Sprite:create("Logon/text_field_frame2.png"))
+		:move(yl.WIDTH/2+30+xPosOffset,280)
+		:setAnchorPoint(cc.p(0.5,0.5))
+		:setFontName("fonts/round_body.ttf")
+		:setPlaceholderFontName("fonts/round_body.ttf")
+		:setFontSize(24)
+		:setPlaceholderFontSize(24)
+        :setFontColor(cc.c3b(0,0,0))
+		:setMaxLength(26)
+		:setInputFlag(cc.EDITBOX_INPUT_FLAG_PASSWORD)
+		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)		
+		:addTo(self._accountLogonPanel)
+
+	-- 忘记密码
+	ccui.Button:create("Logon/btn_login_fgpw.png")
+		:setTag(LogonView.BT_FGPW)
+        :setAnchorPoint(cc.p(0,0.5))
+		:move(1000+xPosOffset- 40,280)
+		:addTo(self._accountLogonPanel)
+		:addTouchEventListener(btcallback)
+
+    --注册按钮
+	ccui.Button:create("Logon/regist_button.png","")
+		:setTag(LogonView.BT_REGISTER)
+        :setAnchorPoint(cc.p(0,0.5))
+		--:move(766+xPosOffset,165)
+        :move(1000+xPosOffset - 40,381)
+		:addTo(self._accountLogonPanel)
+		:addTouchEventListener(btcallback)
+
+    --记住密码
+	self.cbt_Record = ccui.CheckBox:create("Logon/rem_password_button.png","","Logon/choose_button.png","","")
+		:move(515+xPosOffset,165)
+		:setSelected(GlobalUserItem.bSavePassword)
+		:setTag(LogonView.CBT_RECORD)
+		:addTo(self._accountLogonPanel)
+
+    -- 账号登录按钮
+    ccui.Button:create("Logon/account_logon.png", "Logon/account_logon2.png", "Logon/account_logon2.png")
+		:setTag(LogonView.BT_ACCOUNTLOGON)
+		:move(cc.p(515+xPosOffset + 400,165))
+		--:setName("btn_1")
+		:addTo(self._accountLogonPanel)
+		:addTouchEventListener(btcallback)
+
 	self.m_serverConfig = serverConfig or {}
 	self:refreshBtnList()
 end
+
+-- add by wss
+--- 显示账号登录界面
+function LogonView:showAccountPanel()
+    --
+    self._scene._bg:setTexture("background_1_1.png")
+
+    self:getChildByName("btn_1"):setVisible(false)
+    self:getChildByName("btn_2"):setVisible(false)
+    self:getChildByName("btn_3"):setVisible(false)
+
+    self._accountLogonPanel:setVisible(true)
+
+    self._isShowAccountLogonPanel = true
+end
+
+--- 隐藏账号登录界面
+function LogonView:visibleAccountPanel()
+    --
+    self._scene._bg:setTexture("background_1.png")
+
+    self:getChildByName("btn_1"):setVisible(true)
+    self:getChildByName("btn_2"):setVisible(true)
+    self:getChildByName("btn_3"):setVisible(true)
+
+    self._accountLogonPanel:setVisible(false)
+
+    self._isShowAccountLogonPanel = false
+end
+
+
 
 function LogonView:refreshBtnList( )
 	for i = 1, 3 do
@@ -203,12 +312,21 @@ function LogonView:onButtonClickedEvent(tag,ref)
 		GlobalUserItem.bVisitor = true
 		self:getParent():getParent():onVisitor()
 	elseif tag == LogonView.BT_LOGON then
-		GlobalUserItem.bVisitor = false
-		local szAccount = string.gsub(self.edit_Account:getText(), " ", "")
-		local szPassword = string.gsub(self.edit_Password:getText(), " ", "")
-		local bAuto = self:getChildByTag(LogonView.CBT_RECORD):isSelected()
-		local bSave = self:getChildByTag(LogonView.CBT_RECORD):isSelected()
-		self:getParent():getParent():onLogon(szAccount,szPassword,bSave,bAuto)
+        self:showAccountPanel()
+
+--		GlobalUserItem.bVisitor = false
+--		local szAccount = string.gsub(self.edit_Account:getText(), " ", "")
+--		local szPassword = string.gsub(self.edit_Password:getText(), " ", "")
+--		local bAuto = self:getChildByTag(LogonView.CBT_RECORD):isSelected()
+--		local bSave = self:getChildByTag(LogonView.CBT_RECORD):isSelected()
+--		self:getParent():getParent():onLogon(szAccount,szPassword,bSave,bAuto)
+    elseif tag == LogonView.BT_ACCOUNTLOGON then
+        GlobalUserItem.bVisitor = false
+        local szAccount = string.gsub(self.edit_Account:getText(), " ", "")
+        local szPassword = string.gsub(self.edit_Password:getText(), " ", "")
+        local bAuto = self._accountLogonPanel:getChildByTag(LogonView.CBT_RECORD):isSelected()
+        local bSave = self._accountLogonPanel:getChildByTag(LogonView.CBT_RECORD):isSelected()
+        self:getParent():getParent():onLogon(szAccount,szPassword,bSave,bAuto)
 	elseif tag == LogonView.BT_THIRDPARTY then
 		self.m_spThirdParty:setVisible(true)
 	elseif tag == LogonView.BT_WECHAT then
@@ -230,11 +348,21 @@ end
 
 function LogonView:onTouchEnded(touch, event)
 	local pos = touch:getLocation();
-	local m_spBg = self.m_spThirdParty
-    pos = m_spBg:convertToNodeSpace(pos)
-    local rec = cc.rect(0, 0, m_spBg:getContentSize().width, m_spBg:getContentSize().height)
-    if false == cc.rectContainsPoint(rec, pos) then
-        self.m_spThirdParty:setVisible(false)
+--	local m_spBg = self.m_spThirdParty
+--    pos = m_spBg:convertToNodeSpace(pos)
+--    local rec = cc.rect(0, 0, m_spBg:getContentSize().width, m_spBg:getContentSize().height)
+--    if false == cc.rectContainsPoint(rec, pos) then
+--        self.m_spThirdParty:setVisible(false)
+--    end
+
+    --- 判断触摸点是否在账号登录界面 & 账号登录界面显示了
+    if self._isShowAccountLogonPanel then
+        local alPanelPos = cc.p(self._accountLogonPanel:getPosition())
+        local alPanelCSize = self._accountLogonPanel:getContentSize()
+        if pos.x < alPanelPos.x - alPanelCSize.width/2 or pos.x > alPanelPos.x + alPanelCSize.width/2 or
+            pos.y < alPanelPos.y - alPanelCSize.height/2 or pos.y > alPanelPos.y + alPanelCSize.height/2 then
+            self:visibleAccountPanel()
+        end
     end
 end
 

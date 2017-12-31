@@ -68,6 +68,10 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
         gameFrame._shotFrame = self._bankFrame
     end
 
+    
+    -- 
+    self._isGiftScene = isGiftScene
+
 	local areaWidth = yl.WIDTH
 	local areaHeight = yl.HEIGHT
 
@@ -371,7 +375,7 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
 
     end
 
-    
+    --dump(gameFrame,"-=--=-=--------------------- gameFrame")
 end
 
 -- add by wss 
@@ -843,7 +847,7 @@ function BankLayer:onBankCallBack(result,message)
 	end
 
 
-    if isGiftScene then
+    if self._isGiftScene then
         print("-=--=-=--------------------- isGiftScene")
         self:showBankLayer()
     end
