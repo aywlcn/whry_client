@@ -504,8 +504,9 @@ end
 --按键监听
 function BankLayer:onButtonClickedEvent(tag,sender)
 	if tag == BankLayer.BT_TAKE then
-		self:onTakeScore()
-	elseif tag == BankLayer.BT_SAVE then
+		--self:onTakeScore()
+	    self:onTakeScoreByHttp()
+    elseif tag == BankLayer.BT_SAVE then
 		self:onSaveScore()
 	elseif tag == BankLayer.BT_TRANSFER then
 		self:onTransferScore()
@@ -659,6 +660,64 @@ function BankLayer:onEnableBank()
 
 	self:showPopWait()
 	self._bankFrame:onEnableBank(szPass)
+end
+
+-- 用http 取款操作
+function BankLayer:onTakeScoreByHttp()
+    if GlobalUserItem.cbInsureEnabled==0 then
+		self._notifyLayer:setVisible(true)
+		return
+	end
+
+	--参数判断
+	local szScore =  string.gsub(self.edit_Score:getText(),"([^0-9])","")
+    szScore = string.gsub(szScore, "[.]", "")
+	local szPass = self.edit_Password:getText()
+    if #szScore < 1 then 
+        showToast(self,"请输入操作金额！",2)
+        return
+    end
+
+	local lOperateScore = tonumber(szScore)
+	if lOperateScore < 1 then
+		showToast(self,"请输入正确金额！",2)
+		return
+	end
+
+    if lOperateScore > GlobalUserItem.lUserInsure then
+        showToast(self,"您银行游戏币的数目余额不足,请重新输入游戏币数量！",2)
+        return
+    end
+
+    if #szPass < 1 then 
+		showToast(self,"请输入银行密码！",2)
+		return
+	end
+	if #szPass <6 then
+		showToast(self,"密码必须大于6个字符，请重新输入！",2)
+		return
+	end
+
+    local beanurl = yl.HTTP_URL .. "/WS/MobileInterface.ashx"
+    appdf.onHttpJsionTable(beanurl ,"GET","action=GetBankWithdraw&userid=" .. GlobalUserItem.dwUserID .. "&num=".. szScore .. "&pas=".. szPass ,function(sjstable,sjsdata)
+        if sjstable then
+            dump(sjstable, "-------------------------- GetBankWithdraw", 6)
+            showToast(self, sjstable.msg , 3)
+        end
+        local nowInsure = GlobalUserItem.lUserInsure
+        local nowUserScore = GlobalUserItem.lUserScore
+        self._scene:queryUserScoreInfo(function() 
+            local newUserScore = GlobalUserItem.lUserScore
+            local offset = newUserScore - nowUserScore
+            GlobalUserItem.lUserInsure = nowInsure - offset
+            self._txtInsure:setString(string.formatNumberThousands(GlobalUserItem.lUserInsure,true,"/"))
+            self._txtScore:setString(string.formatNumberThousands(GlobalUserItem.lUserScore,true,"/"))
+        end)
+        self._scene:updateInfomation()
+        
+        
+    end)
+
 end
 
 --取款操作

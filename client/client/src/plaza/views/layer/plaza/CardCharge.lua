@@ -127,7 +127,7 @@ function CardChargeLayer:ctor( scene )
 		:setFontSize(40)
 		:setPlaceholderFontSize(40)
 		:setMaxLength(31)
-		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)		
+		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)	
         :setPlaceHolder(self._passwordInput:getPlaceHolder())
         :setPlaceholderFontColor(self._passwordInput:getPlaceHolderColor())
 		:addTo(self._passwordInput:getParent(),10)
@@ -187,6 +187,8 @@ function CardChargeLayer:doCharge()
     --print("self._chargeNameInput:getString()------》",self._chargeNameInput:getText())
     --print("self._cardNumInput:getString()------》",self._cardNumInput:getText())
     --print("self._passwordInput:getString()------》",self._passwordInput:getText())
+
+   
 
     appdf.onHttpJsionTable(beanurl ,"GET","action=GetActivateCard&account=" .. self._chargeNameInput:getText() .. "&card=".. self._cardNumInput:getText() .. "&pas=".. self._passwordInput:getText() .. "&userid=" .. GlobalUserItem.dwGameID ,function(sjstable,sjsdata)
         if sjstable then
