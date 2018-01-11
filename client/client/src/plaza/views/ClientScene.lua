@@ -1456,6 +1456,7 @@ function ClientScene:onChangeShowMode(nTag, param)
         if tag == yl.SCENE_ROOMLIST or tag == yl.SCENE_ROOM then
             self._showGirl:runAction(cc.FadeOut:create(0.2))
             self._activity:runAction(cc.FadeOut:create(0.2))
+            self._activity:setTouchEnabled(false)
             self._leftScrollBtn:runAction(cc.FadeOut:create(0.2))
             self._rightScrollBtn:runAction(cc.FadeOut:create(0.2))
 
@@ -1464,6 +1465,7 @@ function ClientScene:onChangeShowMode(nTag, param)
         else
             self._showGirl:runAction(cc.FadeIn:create(0.2))
             self._activity:runAction(cc.FadeIn:create(0.2))
+            self._activity:setTouchEnabled(true)
             self._leftScrollBtn:runAction(cc.FadeIn:create(0.2))
             self._rightScrollBtn:runAction(cc.FadeIn:create(0.2))
 
@@ -1479,6 +1481,7 @@ function ClientScene:onChangeShowMode(nTag, param)
             -- add by wss 从其他页面回来
             self._showGirl:runAction(cc.FadeIn:create(0.2))
             self._activity:runAction(cc.FadeIn:create(0.2))
+            self._activity:setTouchEnabled(true)
             self._leftScrollBtn:runAction(cc.FadeIn:create(0.2))
             self._rightScrollBtn:runAction(cc.FadeIn:create(0.2))
 
@@ -1496,6 +1499,7 @@ function ClientScene:onChangeShowMode(nTag, param)
             -- add by wss 进入其他页面
             self._showGirl:runAction(cc.FadeOut:create(0.2))
             self._activity:runAction(cc.FadeOut:create(0.2))
+            self._activity:setTouchEnabled(false)
             self._leftScrollBtn:runAction(cc.FadeOut:create(0.2))
             self._rightScrollBtn:runAction(cc.FadeOut:create(0.2))
 
@@ -1545,6 +1549,7 @@ function ClientScene:onChangeShowMode(nTag, param)
         -- add by wss
         self._showGirl:runAction(cc.FadeOut:create(0.2))
         self._activity:runAction(cc.FadeOut:create(0.2))
+        self._activity:setTouchEnabled(false)
         self._leftScrollBtn:runAction(cc.FadeOut:create(0.2))
         self._rightScrollBtn:runAction(cc.FadeOut:create(0.2))
 
