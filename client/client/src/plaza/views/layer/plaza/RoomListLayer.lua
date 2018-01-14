@@ -139,7 +139,8 @@ function RoomListLayer:tableCellAtIndex(view, idx)
 		
 		local cellpos = cc.p(self.m_fThree * 0.5, view:getViewSize().height * 0.5)
 
-		--检查房间背景资源
+        -- 注掉
+--		--检查房间背景资源
 --		local modulestr = string.gsub(enterGame._KindName, "%.", "/")
 --		local path = "game/" .. modulestr .. "res/roomlist/icon_roomlist_" .. wRoom .. ".png"
 --		local framename = enterGame._KindID .. "_icon_roomlist_" .. wRoom .. ".png"
@@ -155,10 +156,12 @@ function RoomListLayer:tableCellAtIndex(view, idx)
 --				:addTo(cell)
 --		end
 
-		--背景
+--		--背景
 --		display.newSprite("RoomList/icon_roomlist_frame.png")
 --			:setPosition(cellpos)
 --			:addTo(cell)
+
+        -- add by wss
         local wLvTem = wLv
         if wLvTem > 4 then
             wLvTem = 4
@@ -167,7 +170,6 @@ function RoomListLayer:tableCellAtIndex(view, idx)
 			:setPosition(cellpos)
 			:addTo(cell)
 
-        ---- add by wss
         -- 入场条件
         local ruchangWord = ccui.Text:create()
         ruchangWord:addTo(spriteBg)
@@ -200,6 +202,8 @@ function RoomListLayer:tableCellAtIndex(view, idx)
 
         xiazhuValue:setString( self:getBetRange(enterGame._KindID,wLvTem) )
 
+
+        -- 注掉
 		--房间类型
 --		framename = enterGame._KindID .. "_title_icon_" .. wLv .. ".png"
 --		frame = cc.SpriteFrameCache:getInstance():getSpriteFrame(framename)
@@ -297,6 +301,7 @@ end
 function RoomListLayer:onStartGame(index)
 	local iteminfo = GlobalUserItem.GetRoomInfo(index)
 	if iteminfo ~= nil then
+        dump(iteminfo , "-=-=---------------- roomlist startGame")
 		self._scene:onStartGame(index)
 	end
 end

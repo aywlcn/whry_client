@@ -26,7 +26,7 @@ menuBtnAnimationVec = {}
 
 function GameListLayer:ctor(gamelist)
 	print("============= 游戏列表界面创建 =============")
-    dump(gamelist,"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--------- gameList -=-=-=-=--------------")
+    --dump(gamelist,"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--------- gameList -=-=-=-=--------------")
 
 	self.m_bQuickStart = false
 
@@ -88,7 +88,7 @@ function GameListLayer:ctor(gamelist)
         local animation = cc.Animation:create()  
         if self._animationNumVec[tonumber(v._KindID)] then
             for i=1 , self._animationNumVec[tonumber(v._KindID)] do
-                print( "-=-=-=-=-=------------ addSpriteFrameWithFile" .. v._KindID )
+                --print( "-=-=-=-=-=------------ addSpriteFrameWithFile" .. v._KindID )
                 local targetPlatform = cc.Application:getInstance():getTargetPlatform()
                 local filename = "GameList/game_" ..v._KindID.."/" .. i .. ".png"
                 --assert( cc.FileUtils:getInstance():isFileExist(filename) , string.format("--------------file %s not exist" , filename ) )
