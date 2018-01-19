@@ -148,10 +148,15 @@ function GameFrameEngine:onSocketLogonEvent(sub,dataBuffer)
 	--登录完成
 	if sub == game_cmd.SUB_GR_LOGON_FINISH then	
 		self:onSocketLogonFinish()
+        print("-=-=---------------------------- 登录完成")
+        local cmd_table = ExternalFun.read_netdata(game_cmd.CMD_GR_LogonSuccess, dataBuffer)
+        --dump(cmd_table, "CMD_GR_LogonSuccess", 4)
 	-- 登录成功
 	elseif sub == game_cmd.SUB_GR_LOGON_SUCCESS then
 		local cmd_table = ExternalFun.read_netdata(game_cmd.CMD_GR_LogonSuccess, dataBuffer)
-		dump(cmd_table, "CMD_GR_LogonSuccess", 4)
+        print("-=-=---------------------------- 登录成功")
+		--dump(cmd_table, "CMD_GR_LogonSuccess", 4)
+        print("%%%%%%%%%%%%%%%%%%%--------------------------------------------------------------------------------------------------------------")
 	--登录失败
 	elseif sub == game_cmd.SUB_GR_LOGON_FAILURE then	
 		local errorCode = dataBuffer:readint()
@@ -199,6 +204,7 @@ end
 
 --房间配置
 function GameFrameEngine:onSocketConfigEvent(sub,dataBuffer)
+    print("------------====== onSocketConfigEvent,",sub)
 	--房间配置
 	if sub == yl.SUB_GR_CONFIG_SERVER then
 		self._wTableCount  		= dataBuffer:readword()
@@ -206,7 +212,9 @@ function GameFrameEngine:onSocketConfigEvent(sub,dataBuffer)
 		self._wServerType  		= dataBuffer:readword()
 		self._dwServerRule 		= dataBuffer:readdword()
 		GlobalUserItem.dwServerRule = self._dwServerRule
-
+        print("------------====== self._dwServerRule,",self._dwServerRule)
+        print("------------====== isAntiCheat,", GlobalUserItem.isAntiCheat() and true or false )
+        
 		--是否进入防作弊
 		self:setEnterAntiCheatRoom(GlobalUserItem.isAntiCheat())
 		print("房间配置[table:"..self._wTableCount.."][chair:"..self._wChairCount.."][type:"..self._wServerType.."][rule:"..self._dwServerRule.."]")
@@ -288,6 +296,7 @@ function GameFrameEngine:onSocketUserEvent(sub,dataBuffer)
 end
 --用户进入
 function GameFrameEngine:onSocketUserEnter(dataBuffer)
+    print("------------------------------------------ onSocketUserEnter")
 	local userItem = UserItem:create()
 
 	userItem.dwGameID		= dataBuffer:readdword()
@@ -422,7 +431,7 @@ function GameFrameEngine:onSocketUserEnter(dataBuffer)
 end
 --用户积分
 function GameFrameEngine:onSocketUserScore(dataBuffer)
-	
+	print("------------------------------------------ onSocketUserScore")
 	local dwUserID = dataBuffer:readdword()
 
 	local int64 = Integer64.new()
@@ -457,7 +466,7 @@ end
 
 --用户状态
 function GameFrameEngine:onSocketUserStatus(dataBuffer)
-
+    print("-==================================== onSocketUserStatus")
 	--读取信息
 	local dwUserID 		= dataBuffer:readdword()
 	local newstatus = {}
