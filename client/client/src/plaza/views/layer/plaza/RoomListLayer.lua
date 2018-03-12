@@ -139,8 +139,7 @@ function RoomListLayer:tableCellAtIndex(view, idx)
 		
 		local cellpos = cc.p(self.m_fThree * 0.5, view:getViewSize().height * 0.5)
 
-        -- 注掉
---		--检查房间背景资源
+		--检查房间背景资源
 --		local modulestr = string.gsub(enterGame._KindName, "%.", "/")
 --		local path = "game/" .. modulestr .. "res/roomlist/icon_roomlist_" .. wRoom .. ".png"
 --		local framename = enterGame._KindID .. "_icon_roomlist_" .. wRoom .. ".png"
@@ -156,12 +155,10 @@ function RoomListLayer:tableCellAtIndex(view, idx)
 --				:addTo(cell)
 --		end
 
---		--背景
+		--背景
 --		display.newSprite("RoomList/icon_roomlist_frame.png")
 --			:setPosition(cellpos)
 --			:addTo(cell)
-
-        -- add by wss
         local wLvTem = wLv
         if wLvTem > 4 then
             wLvTem = 4
@@ -170,6 +167,7 @@ function RoomListLayer:tableCellAtIndex(view, idx)
 			:setPosition(cellpos)
 			:addTo(cell)
 
+        ---- add by wss
         -- 入场条件
         local ruchangWord = ccui.Text:create()
         ruchangWord:addTo(spriteBg)
@@ -202,8 +200,6 @@ function RoomListLayer:tableCellAtIndex(view, idx)
 
         xiazhuValue:setString( self:getBetRange(enterGame._KindID,wLvTem) )
 
-
-        -- 注掉
 		--房间类型
 --		framename = enterGame._KindID .. "_title_icon_" .. wLv .. ".png"
 --		frame = cc.SpriteFrameCache:getInstance():getSpriteFrame(framename)
@@ -243,7 +239,7 @@ end
 
 --- 获取下注区间
 function RoomListLayer:getBetRange(gameKind,lv)
-    if tonumber( gameKind ) == 6 or tonumber( gameKind ) == 508 or tonumber( gameKind ) == 503 or tonumber( gameKind ) == 510 or tonumber( gameKind ) == 511 then
+    if tonumber( gameKind ) == 6 or tonumber( gameKind ) == 102 or tonumber( gameKind ) == 508 or tonumber( gameKind ) == 503 or tonumber( gameKind ) == 510 or tonumber( gameKind ) == 511 then
         if lv == 1 then
             return "10-100"
         elseif lv == 2 then
@@ -267,7 +263,19 @@ function RoomListLayer:getBetRange(gameKind,lv)
         else
             return "10-100"
         end
-    elseif tonumber( gameKind ) == 516 or tonumber( gameKind ) == 502 then
+    elseif tonumber( gameKind ) == 516 or tonumber( gameKind ) == 519 or tonumber( gameKind ) == 502 then
+        if lv == 1 then
+            return "10-80"
+        elseif lv == 2 then
+            return "100-800"
+        elseif lv == 3 then
+            return "1千-8千"
+        elseif lv == 4 then
+            return "1万-8万"
+        else
+            return "10-100"
+        end
+    else
         if lv == 1 then
             return "10-80"
         elseif lv == 2 then
@@ -301,7 +309,6 @@ end
 function RoomListLayer:onStartGame(index)
 	local iteminfo = GlobalUserItem.GetRoomInfo(index)
 	if iteminfo ~= nil then
-        dump(iteminfo , "-=-=---------------- roomlist startGame")
 		self._scene:onStartGame(index)
 	end
 end

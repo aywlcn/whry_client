@@ -11,7 +11,7 @@ local PopWait = class("PopWait", function(isTransparent)
 	end    
 end)
 
-function PopWait:ctor(isTransparent)
+function PopWait:ctor(isTransparent , showStr)
 	
 	if width == nil or height == nil then
 		self:setContentSize(display.width,display.height)
@@ -31,6 +31,16 @@ function PopWait:ctor(isTransparent)
 			:move(appdf.WIDTH/2,appdf.HEIGHT/2 )	
 			:runAction(cc.RepeatForever:create(cc.RotateBy:create(2 , 360)))
 	end	
+
+    -- add by wss
+    self._txtTips = ccui.Text:create("", "fonts/round_body.ttf", 18)
+         	:move(appdf.WIDTH/2,appdf.HEIGHT/2 - 50 )	
+         	:setTextColor(cc.c4b(255,250,255,255))
+         	:addTo(self)
+
+
+    self._txtTips:setString(showStr)        
+
 end
 
 --显示

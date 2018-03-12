@@ -62,7 +62,6 @@ function GameViewLayer:OnResetView()
     self.m_GameEndView:setVisible(false)
 
 	self:SetBanker(yl.INVALID_CHAIR)
-	--self:SetRoomHolder(yl.INVALID_CHAIR)
 	self:SetAllTableScore(0)
 	self:SetCompareCard(false)
 	self:CleanAllJettons()
@@ -77,10 +76,6 @@ function GameViewLayer:OnResetView()
 		self:SetUserCard(i, nil)
         self:clearCard(i)
 	end
-
-	self.nAllTableScore = 0 --总分
-	self.nChipsNum = 0	  --小筹码个数
-	self.BigChipValue = 0 --转换玩的筹码数值
 end
 
 function GameViewLayer:onExit()
@@ -247,7 +242,7 @@ function GameViewLayer:ctor(scene)
 			:setLineBreakWithoutSpace(false)
 			:setColor(cc.c3b(255, 255, 255))
 			:addTo(self.m_UserHead[i].bg)
-		--游戏币
+		--金币
 		self.m_UserHead[i].score = cc.Label:createWithTTF("", "fonts/round_body.ttf", txtsize)
 			:move(scorepos)
 			:setAnchorPoint(cc.p(0,0.5))
@@ -371,10 +366,6 @@ function GameViewLayer:ctor(scene)
 			
 	--庄家
 	self.m_BankerFlag = display.newSprite("#banker.png")
-		:setVisible(false)
-		:addTo(self)
-	--房主
-	self.m_RoomHolderFlag = cc.Sprite:create(cmd.RES.."game_roomHolder.png")
 		:setVisible(false)
 		:addTo(self)
 	--筹码按钮
@@ -525,10 +516,6 @@ function GameViewLayer:ctor(scene)
     local animate = AnimationMgr.getAnimate(param)
     self.m_actVoiceAni = cc.RepeatForever:create(animate)
     self.m_actVoiceAni:retain()
-
-    self.nAllTableScore = 0 --总分
-	self.nChipsNum = 0	  --小筹码个数
-	self.BigChipValue = 0 --转换玩的筹码数值
 end
 
 --更新时钟
@@ -570,14 +557,6 @@ function GameViewLayer:OnUpdateUser(viewid,userItem)
 			self.m_UserHead[viewid].head:updateHead(userItem)
 		end
 		self.m_UserHead[viewid].head:setVisible(true)
-
-		--判断房主
-		print("设置房主信息", PriRoom, userItem.dwUserID, PriRoom:getInstance().m_tabPriData.dwTableOwnerUserID)
-		if PriRoom and GlobalUserItem.bPrivateRoom then
-			if userItem.dwUserID == PriRoom:getInstance().m_tabPriData.dwTableOwnerUserID then
-				self:SetRoomHolder(viewid)
-			end
-		end
 	end
 end
 
@@ -678,38 +657,25 @@ function GameViewLayer:PlayerJetton(wViewChairId, num,notani)
 	local chipscore = num
 	while chipscore > 0 
 	do
-		if 0 == chipscore then
-			break
-		end
 		local strChip
 		local strScore 
-		local ChipsType = 0
-		if chipscore >= self.m_lCellScore * 50 then
-			strChip = "#bigchip_gray.png"
-			chipscore = chipscore - self.m_lCellScore * 50
-			strScore = (self.m_lCellScore*50)..""
-		elseif chipscore >= self.m_lCellScore * 5 then
+		if chipscore >= self.m_lCellScore * 5 then
 			strChip = "#bigchip_2.png"
 			chipscore = chipscore - self.m_lCellScore * 5
 			strScore = (self.m_lCellScore*5)..""
-			ChipsType = 5;
 		elseif chipscore >= self.m_lCellScore*2 then
 			strChip = "#bigchip_1.png"
 			chipscore = chipscore - self.m_lCellScore * 2
 			strScore = (self.m_lCellScore*2)..""
-			ChipsType = 2;
 		else
 			strChip = "#bigchip_0.png"
 			chipscore = chipscore - self.m_lCellScore 
 			strScore = self.m_lCellScore..""
-			ChipsType = 1;
 		end
 		local chip = display.newSprite(strChip)
 			:setScale(0.5)
 			:addTo(self.nodeChipPool)
-			self.nChipsNum = self.nChipsNum +1	  --小筹码个数
-			chip:setTag(1000 *ChipsType+ self.nChipsNum)
-	
+
 		cc.Label:createWithTTF(strScore, "fonts/round_body.ttf", 18)
 			:move(54, 53)
 			:setColor(cc.c3b(48, 48, 48))
@@ -723,56 +689,16 @@ function GameViewLayer:PlayerJetton(wViewChairId, num,notani)
 				chip:move(cc.p(507+ math.random(315), 390 + math.random(190)))
 			end
 		else
-			print("刷新筹码，筹码分值", chipscore)
 			chip:move(ptCoin[wViewChairId].x,  ptCoin[wViewChairId].y)
-			function callbackWithArgs(chipscore)
-	              local ret = function ()
-	              	if 0 == chipscore then --最后的筹码动作完成，做合成大筹码动作
-						--获取大筹码个数
-						local children = self.nodeChipPool:getChildren()
-						local type1Num = 0
-						local type2Num = 0
-						local type5Num = 0
-						for k, v in pairs(children) do
-							if v:getTag() > 1000 and v:getTag() < 2000 then
-								type1Num = type1Num +1
-							end
-							if v:getTag() > 2000 and v:getTag() < 5000 then
-								type2Num = type2Num +1
-							end
-							if v:getTag() > 5000 then
-								type5Num = type5Num +1
-							end
-						end
-						--不同档次到达指定额度，都会刷新(多加2个，防止操用户正在下注的筹码)
-						if type5Num > 10 then
-							print("刷新游戏币池")
-							self:ChangeAllJettons(5, 10)
-						end
-						if type2Num > 25 then
-							print("刷新游戏币池")
-							self:ChangeAllJettons(2, 25)
-						end
-						if type2Num > 50 then
-							print("刷新游戏币池")
-							self:ChangeAllJettons(1, 50)
-						end
-					end
-	              end
-	              return ret
-	        end
-	        local callFun = cc.CallFunc:create(callbackWithArgs(chipscore))
-	
 			if wViewChairId < 3 then	
-				chip:runAction(cc.Sequence:create(cc.MoveTo:create(0.2, cc.p(350+ math.random(315), 390 + math.random(190))), callFun))
+				chip:runAction(cc.MoveTo:create(0.2, cc.p(350+ math.random(315), 390 + math.random(190))))
 			elseif wViewChairId > 3 then
-				chip:runAction(cc.Sequence:create(cc.MoveTo:create(0.2, cc.p(667+ math.random(315), 390 + math.random(190))), callFun))
+				chip:runAction(cc.MoveTo:create(0.2, cc.p(667+ math.random(315), 390 + math.random(190))))
 			else
-				chip:runAction(cc.Sequence:create(cc.MoveTo:create(0.2, cc.p(507+ math.random(315), 390 + math.random(190))), callFun))
-	end
+				chip:runAction(cc.MoveTo:create(0.2, cc.p(507+ math.random(315), 390 + math.random(190))))
 			end
 		end
-
+	end
 	if not notani then
 		self._scene:PlaySound(cmd.RES.."sound_res/ADD_SCORE.wav")
 	end
@@ -838,35 +764,11 @@ function GameViewLayer:SetBanker(viewid)
 	self.m_BankerFlag:setVisible(true)
 end
 
---房主显示
-function GameViewLayer:SetRoomHolder(viewid)
-	if not viewid or viewid == yl.INVALID_CHAIR then
-		self.m_RoomHolderFlag:setVisible(false)
-		return
-	end
-	local x
-	local y
-	if viewid < 3 then
-		x = ptPlayer[viewid].x - 50
-		y = ptPlayer[viewid].y + 100
-	elseif viewid > 3 then
-		x = ptPlayer[viewid].x + 50
-		y = ptPlayer[viewid].y + 100
-	else
-		x = ptPlayer[viewid].x -48
-		y = ptPlayer[viewid].y + 68
-	end
-
-	self.m_RoomHolderFlag:setPosition(x, y)
-	self.m_RoomHolderFlag:setVisible(true)
-end
-
 --下注总额
 function GameViewLayer:SetAllTableScore(score)
 	if not score or score == 0 then
 		self.m_AllScoreBG:setVisible(false)
 	else
-		self.nAllTableScore = score
 		self.m_txtAllScore:setString(score)
 		self.m_AllScoreBG:setVisible(true)
 	end
@@ -875,7 +777,7 @@ end
 
 --玩家下注
 function GameViewLayer:SetUserTableScore(viewid, score)
-	--增加桌上下注游戏币
+	--增加桌上下注金币
 	if not score or score == 0 then
 		if viewid ~= cmd.MY_VIEWID then
 			self.m_ScoreView[viewid].frame:setVisible(false)
@@ -1017,43 +919,6 @@ end
 --清理筹码
 function GameViewLayer:CleanAllJettons()
 	self.nodeChipPool:removeAllChildren()
-end
-
---筹码转换
-function GameViewLayer:ChangeAllJettons(type, num)
-	-- body
-	--绘制大额筹码
-	local strChip = "#bigchip_gray.png"
-	local strScore = (self.m_lCellScore*50)..""
-	self.nChipsNum  = self.nChipsNum +1
-	local chip = display.newSprite(strChip)
-		:setScale(0.5)
-		:addTo(self.nodeChipPool)
-		:setTag(self.nChipsNum)
-	cc.Label:createWithTTF(strScore, "fonts/round_body.ttf", 18)
-		:move(54, 53)
-		:setColor(cc.c3b(48, 48, 48))
-		:addTo(chip)
-	chip:setPosition( cc.p(350+ math.random(315), 390 + math.random(190)))
-	local  pos = cc.p(chip:getPositionX(),chip:getPositionY())
-	print("重新绘制筹码", pos.x, pos.y)
-
-	--移除十个大筹码
-	local numMove = 0
-	local children = self.nodeChipPool:getChildren()
-	for k, v in pairs(children) do
-		if v:getTag() > type* 1000 then
-			print("重新绘制筹码1", pos.x, pos.y)
-			v:runAction(cc.Sequence:create(cc.MoveTo:create(0.4, pos),
-				cc.CallFunc:create(function(node)
-					node:removeFromParent()
-				end)))
-			numMove = numMove +1
-			if numMove > num -1 then
-				break
-			end
-		end
-	end
 end
 
 --取消比牌选择

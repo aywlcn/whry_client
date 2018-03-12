@@ -39,7 +39,7 @@ yl.VALIDATE 							= "E4954CD9-7089-4F7D-85F6-7B6EA082312E" --@compilation
 --http请求链接地址
 --yl.HTTP_URL								= "http://ry.webfox.com" --@http_url
 --yl.HTTP_URL								= "http://ry.webfox.com" --@http_url
-yl.HTTP_URL								= "http://www.9111813.cn/" --@http_url
+yl.HTTP_URL								= "https://www.9111813.cn/" --@http_url
 
 -- http请求支持(loginScene)
 yl.HTTP_SUPPORT							= true
@@ -422,7 +422,7 @@ yl.ShareErrorCode =
 --微信配置定义
 yl.WeChat = 
 {
-	AppID 								= "wxec74d16539be4c99", --@wechat_appid_wx
+	AppID 								= "wxec74d16539be4c99", --@wechat_appid_wx 
 	AppSecret 							= "ff2d8a3f550df5c2fcd13c525f82b2e5", --@wechat_secret_wx
 	-- 商户id
 	PartnerID 							= " ", --@wechat_partnerid_wx

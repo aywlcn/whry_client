@@ -106,7 +106,7 @@ function GameEndView:OnButtonClickedEvent(tag,ref)
     if tag == GameEndView.BT_GAME_CONTINUE then
         if  self:getParent()._scene.m_bNoScore then
             local QueryDialog = appdf.req("app.views.layer.other.QueryDialog")
-            local msg = self:getParent()._scene.m_szScoreMsg or "你的游戏币不足，无法继续游戏"
+            local msg = self:getParent()._scene.m_szScoreMsg or "你的金币不足，无法继续游戏"
             local query = QueryDialog:create(msg, function(ok)
                 if ok == true then
                     self:getParent()._scene:onExitTable()

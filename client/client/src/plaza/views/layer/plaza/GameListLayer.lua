@@ -28,7 +28,7 @@ function GameListLayer:ctor(gamelist)
 	print("============= 游戏列表界面创建 =============")
     --dump(gamelist,"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--------- gameList -=-=-=-=--------------")
 
-	self.m_bQuickStart = false
+	self.m_bQuickStart = true
 
 	local this = self
 
@@ -70,6 +70,7 @@ function GameListLayer:ctor(gamelist)
     -- 动画的张数
     self._animationNumVec = {
         [6] = 10,
+        [102] = 8,
         [104] = 8,
         [122] = 8,
         [123] = 9,
@@ -80,6 +81,8 @@ function GameListLayer:ctor(gamelist)
         [510] = 8,
         [511] = 10,
         [516] = 9,
+        [519] = 8,
+        [600] = 9,
     }
     -- 动画数组
     --self._menuBtnAnimationVec = {}
@@ -88,7 +91,7 @@ function GameListLayer:ctor(gamelist)
         local animation = cc.Animation:create()  
         if self._animationNumVec[tonumber(v._KindID)] then
             for i=1 , self._animationNumVec[tonumber(v._KindID)] do
-                --print( "-=-=-=-=-=------------ addSpriteFrameWithFile" .. v._KindID )
+                print( "-=-=-=-=-=------------ addSpriteFrameWithFile" .. v._KindID )
                 local targetPlatform = cc.Application:getInstance():getTargetPlatform()
                 local filename = "GameList/game_" ..v._KindID.."/" .. i .. ".png"
                 --assert( cc.FileUtils:getInstance():isFileExist(filename) , string.format("--------------file %s not exist" , filename ) )
@@ -319,10 +322,12 @@ function GameListLayer.tableCellAtIndex(view, idx)
 	    local game = nil
 	    local mask = nil
 	    local spTip = nil
+        local wordTip = nil
         --- 2
         local game2 = nil
 	    local mask2 = nil
 	    local spTip2 = nil
+        local wordTip2 = nil
 
         -- 更新，转圈圈的位置
 	    local cellpos = cc.p( view:getParent()._listViewSize.width / 3 * 0.5 , realHPosHeight1 + view:getParent()._cellSize.height/2 )  -- cc.p(view:getParent().m_fThird * 0.5,view:getViewSize().height * 0.5)
@@ -369,6 +374,7 @@ function GameListLayer.tableCellAtIndex(view, idx)
                 -- add by wss
                 local app = view:getParent():getParent():getParent():getApp()
 	            local version = tonumber(app:getVersionMgr():getResVersion(gameinfo._KindID))
+ 
 	            if not version or gameinfo._ServerResVersion > version then
 		            mask:setVisible(true)
 	            else
@@ -389,6 +395,14 @@ function GameListLayer.tableCellAtIndex(view, idx)
 				    cycle:setName("download_cycle")
 				    cell:addChild(cycle)
 			    end			
+
+                wordTip = cc.Label:createWithTTF("", "fonts/round_body.ttf", 28)
+				    :enableOutline(cc.c4b(0,0,0,255), 1)
+				    :move( cc.p(cellpos.x , cellpos.y - 80 ))
+				    :setName("download_word_tip")
+                    :setTextColor(cc.c4b(0,250,255,255))
+				    :addTo(cell)
+
 		    end	
 
             -- touch event
@@ -397,16 +411,19 @@ function GameListLayer.tableCellAtIndex(view, idx)
             game:addTouchEventListener(function(ref, tType)
                 if tType == ccui.TouchEventType.began then
                     view:getParent()._startTouchBeginGameListId = realGmaeListIndex1
-
+                    print("-=-=-=-=-=-================================ up up up touch begin")
                     return true
                 elseif tType == ccui.TouchEventType.ended then   
+                    print("-=-=-=-=-=-================================ up up up touch end1")
                     local touchBeginPos = view:getParent()._touchBeginPos
                     local listViewRect = cc.rect(view:getParent()._listViewPos.x , view:getParent()._listViewPos.y , view:getParent()._listViewSize.width , view:getParent()._listViewSize.height)
                     if touchBeginPos.x < listViewRect.x or touchBeginPos.x > listViewRect.x + listViewRect.width  or touchBeginPos.y < listViewRect.y or touchBeginPos.y > listViewRect.y + listViewRect.height then
+                        print("-=-=-=-=-=-================================ up up up touch end2")
                         return
                     end
 
                     if view:getParent()._startTouchBeginGameListId ~= realGmaeListIndex1 then
+                        print("-=-=-=-=-=-================================ up up up touch end3")
                         return
                     end
                     if not view:getParent()._canTouchInGame then
@@ -432,6 +449,11 @@ function GameListLayer.tableCellAtIndex(view, idx)
 	                --下载/更新资源 clientscene:getApp
 	                local app = gamelistLayer:getParent():getParent():getApp()
 	                local version = tonumber(app:getVersionMgr():getResVersion(gameinfo._KindID))
+                    
+                    if version == nil then --下载游戏
+                        gamelistLayer:downloadGame(gameinfo, cell:getIdx(),1)
+                        return
+                    end
 	                if not version or gameinfo._ServerResVersion > version then
 		                gamelistLayer:updateGame(gameinfo, cell:getIdx() , 1)
 	                else
@@ -511,6 +533,15 @@ function GameListLayer.tableCellAtIndex(view, idx)
 			        cycle:setName("download_cycle2")
 			        cell:addChild(cycle)
 			    end			
+
+                wordTip2 = cc.Label:createWithTTF("", "fonts/round_body.ttf", 28)
+				    :enableOutline(cc.c4b(0,0,0,255), 1)
+				    :move( cc.p(cellpos2.x , cellpos2.y - 80 ))
+				    :setName("download_word_tip2")
+                    :setTextColor(cc.c4b(0,250,255,255))
+				    :addTo(cell)
+
+
 		    end	
             
             -- 2 touch event
@@ -557,9 +588,15 @@ function GameListLayer.tableCellAtIndex(view, idx)
 	                end
 	                gameinfo.gameIndex = index
 
+     
 	                --下载/更新资源 clientscene:getApp
 	                local app = gamelistLayer:getParent():getParent():getApp()
 	                local version = tonumber(app:getVersionMgr():getResVersion(gameinfo._KindID))
+                   
+                    if version == nil then --下载游戏
+                        gamelistLayer:downloadGame(gameinfo, cell:getIdx(),2)
+                        return
+                    end
 	                if not version or gameinfo._ServerResVersion > version then
 		                gamelistLayer:updateGame(gameinfo, cell:getIdx() , 2)
 	                else
@@ -577,9 +614,9 @@ function GameListLayer.tableCellAtIndex(view, idx)
 
 	    else-----------------------------------------------------------------------------------------------
 		    game = cell:getChildByTag(1)
-            dump(gameinfo,"-=-=-=-=-=-=-------------- gameinfo")
+            --dump(gameinfo,"-=-=-=-=-=-=-------------- gameinfo")
             print("-=-=-=-=-=-=-=---------------- filestr",filestr)
-            dump(gameinfo2,"-=-=-=-=-=-=-------------- gameinfo2")
+            --dump(gameinfo2,"-=-=-=-=-=-=-------------- gameinfo2")
             print("-=-=-=-=-=-=-=---------------- filestr2",filestr2)
 
 		    game:loadTexture(filestr)
@@ -773,6 +810,145 @@ function GameListLayer:onLogonCallBack(result,message)
 	end
 end
 
+
+--下载游戏
+function GameListLayer:downloadGame(gameinfo, index,layerId)
+    if self._downgameinfo then
+        showToast(nil, "正在更新 请稍后", 2)
+        return
+    end
+    --保存更新的游戏
+    self._downgameinfo = gameinfo
+    local app = self:getParent():getParent():getApp()
+    self:showGameUpdateWait()
+    local updateUrl = app._updateUrl ;
+    --下载地址
+    local fileurl = updateUrl .. "/game/" .. string.sub(gameinfo._Module, 1, -2) .. ".zip"
+    --文件名
+    local pos = string.find(gameinfo._Module, "/")
+    local savename = string.sub(gameinfo._Module, pos + 1, -2) .. ".zip"
+    --保存路径
+    local savepath = nil
+    local unzippath = nil
+    local targetPlatform = cc.Application:getInstance():getTargetPlatform()
+    if cc.PLATFORM_OS_WINDOWS == targetPlatform then
+        savepath = device.writablePath .. "download/game/" .. gameinfo._Type .. "/"
+        unzippath = device.writablePath .. "download/"
+    else
+        savepath = device.writablePath .. "game/" .. gameinfo._Type .. "/"
+        unzippath = device.writablePath
+    end
+    
+    
+    local cell = nil
+    if nil ~= index then
+        cell = self._listView:cellAtIndex(index)
+    end
+    
+    
+    if nil ~= cell then
+       if layerId == 1 then
+		    self.m_spDownloadMask = cell:getChildByName("download_mask")
+		    if nil ~= self.m_spDownloadMask then
+			    self.m_szMaskSize = self.m_spDownloadMask:getContentSize()			
+		    end
+		    self.m_labDownloadTip = cell:getChildByName("download_mask_tip")
+		    if nil ~= self.m_labDownloadTip then
+			    self.m_labDownloadTip:setString("0%")
+		    end
+            self.m_labDownWordTip = cell:getChildByName("download_word_tip")
+		    if nil ~= self.m_labDownWordTip then
+			    self.m_labDownWordTip:setString("下载中...")
+		    end
+		    self.m_spDownloadCycle = cell:getChildByName("download_cycle")
+		    if nil ~= self.m_spDownloadCycle then
+			    self.m_spDownloadCycle:stopAllActions()
+			    self.m_spDownloadCycle:setVisible(true)
+			    self.m_spDownloadCycle:runAction(cc.RepeatForever:create(cc.RotateBy:create(1.0, 360)))
+		    end
+        end
+        if layerId == 2 then
+            -- 2
+            self.m_spDownloadMask = cell:getChildByName("download_mask2")
+		    if nil ~= self.m_spDownloadMask then
+			    self.m_szMaskSize = self.m_spDownloadMask:getContentSize()			
+		    end
+		    self.m_labDownloadTip = cell:getChildByName("download_mask_tip2")
+		    if nil ~= self.m_labDownloadTip then
+			    self.m_labDownloadTip:setString("0%")
+		    end
+            self.m_labDownWordTip2 = cell:getChildByName("download_word_tip2")
+		    if nil ~= self.m_labDownWordTip2 then
+			    self.m_labDownWordTip2:setString("下载中...")
+		    end
+		    self.m_spDownloadCycle = cell:getChildByName("download_cycle2")
+		    if nil ~= self.m_spDownloadCycle then
+			    self.m_spDownloadCycle:stopAllActions()
+			    self.m_spDownloadCycle:setVisible(true)
+			    self.m_spDownloadCycle:runAction(cc.RepeatForever:create(cc.RotateBy:create(1.0, 360)))
+		    end
+        end
+    end
+    
+    --下载游戏压缩包
+    downFileAsync(fileurl, savename, savepath, function(main, sub)
+            
+            --对象已经被销毁
+            if not self.__cname then
+                return
+            end
+            
+            --下载回调
+            if main == appdf.DOWN_PRO_INFO then --进度信息
+                self:updateProgress("", "", sub)
+            elseif main == appdf.DOWN_COMPELETED then --下载完毕
+                local zipfile = savepath .. savename
+
+                if layerId == 1 then
+                    self.m_labDownWordTip = cell:getChildByName("download_word_tip")
+		            if nil ~= self.m_labDownWordTip then
+			            self.m_labDownWordTip:setString("解压中...")
+		            end
+                elseif layerId == 2 then
+                    self.m_labDownWordTip2 = cell:getChildByName("download_word_tip2")
+		            if nil ~= self.m_labDownWordTip2 then
+			            self.m_labDownWordTip2:setString("解压中...")
+		            end
+                end
+
+                --解压
+                unZipAsync(zipfile, unzippath, function(result)
+                        --删除压缩文件
+                        os.remove(zipfile)
+                        --清空正在更新的游戏状态
+                        self:updateResult(true, "", false)
+                        if result == 1 then
+                            --保存版本记录  
+                            print("下载完毕")
+                            local app = self:getParent():getParent():getApp()
+                            -- 更新版本号
+                            for k, v in pairs(app._gameList) do
+                                if v._KindID == gameinfo._KindID then
+                                    app:getVersionMgr():setResVersion(gameinfo._ServerResVersion, gameinfo._KindID)
+                                    v._Active = true
+                                    break
+                                end
+                            end
+                            showToast(nil, "下载完毕", 2)
+              
+                        else
+                            showToast(nil, "解压失败", 2)
+                            print("解压失败")
+                        end
+                end)
+            else
+                --清空正在更新的游戏状态
+                self:updateResult(false, "", false)
+                showToast(nil, "下载失败，错误码：" .. main .. ", " .. sub, 2)
+            end
+    end)
+end
+
 --显示等待
 function GameListLayer:showPopWait(isTransparent)
 	self:getParent():getParent():showPopWait(isTransparent)
@@ -810,6 +986,10 @@ function GameListLayer:updateGame(gameinfo, index , layerId)
 		    if nil ~= self.m_labDownloadTip then
 			    self.m_labDownloadTip:setString("0%")
 		    end
+            self.m_labDownWordTip = cell:getChildByName("download_word_tip")
+		    if nil ~= self.m_labDownWordTip then
+			    self.m_labDownWordTip:setString("下载中...")
+		    end
 		    self.m_spDownloadCycle = cell:getChildByName("download_cycle")
 		    if nil ~= self.m_spDownloadCycle then
 			    self.m_spDownloadCycle:stopAllActions()
@@ -826,6 +1006,10 @@ function GameListLayer:updateGame(gameinfo, index , layerId)
 		    self.m_labDownloadTip = cell:getChildByName("download_mask_tip2")
 		    if nil ~= self.m_labDownloadTip then
 			    self.m_labDownloadTip:setString("0%")
+		    end
+            self.m_labDownWordTip2 = cell:getChildByName("download_word_tip2")
+		    if nil ~= self.m_labDownWordTip2 then
+			    self.m_labDownWordTip2:setString("下载中...")
 		    end
 		    self.m_spDownloadCycle = cell:getChildByName("download_cycle2")
 		    if nil ~= self.m_spDownloadCycle then
@@ -914,7 +1098,7 @@ function GameListLayer:updateResult(result,msg)
 			end
 		end
 
-		self._txtTips:setString("OK")
+		-- self._txtTips:setString("OK")
 		self:onEnterGame(self._downgameinfo)
 	else
 		local runScene = cc.Director:getInstance():getRunningScene()

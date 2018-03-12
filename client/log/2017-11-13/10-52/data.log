@@ -1,6 +1,0 @@
-[
-    {
-        "logtime": "2017/11/13 10:52:17",
-        "logdata": "[string \".\\client/src/plaza/views/layer/plaza/GameList...\"]:92: file F:\\whry_client\\client\\client/res/GameList2/game_6/1.png not exist\nstack traceback:\n\t[string \".\\client/src/plaza/views/layer/plaza/GameList...\"]:92: in function 'ctor'\n\t[string \".\\cocos/cocos2d/functions.lua\"]:239: in function 'create'\n\t[string \".\\client/src/plaza/views/ClientScene.lua\"]:1593: in function 'getTagLayer'\n\t[string \".\\client/src/plaza/views/ClientScene.lua\"]:1378: in function 'onChangeShowMode'\n\t[string \".\\client/src/plaza/views/ClientScene.lua\"]:526: in function 'onCreate'\n\t[string \".\\packages/mvc/ViewBase.lua\"]:20: in function 'ctor'\n\t[string \".\\cocos/cocos2d/functions.lua\"]:239: in function 'createViewEx'\n\t[string \".\\packages/mvc/AppBase.lua\"]:46: in function 'enterSceneEx'\n\t[string \".\\client/src/plaza/views/LogonScene.lua\"]:508: in function 'callback'\n\t[string \".\\base/src/app/models/AppDF.lua\"]:175: in function <[string \".\\base/src/app/models/AppDF.lua\"]:156>"
-    }
-]

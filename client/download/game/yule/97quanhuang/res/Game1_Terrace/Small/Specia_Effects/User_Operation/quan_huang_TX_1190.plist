@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>frames</key>
+        <dict>
+            <key>quan_huang1190.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,2},{641,314}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{641,314}}</string>
+                <key>sourceSize</key>
+                <string>{641,314}</string>
+            </dict>
+        </dict>
+        <key>metadata</key>
+        <dict>
+            <key>format</key>
+            <integer>2</integer>
+            <key>realTextureFileName</key>
+            <string>quan_huang_TX_1190.png</string>
+            <key>size</key>
+            <string>{645,318}</string>
+            <key>smartupdate</key>
+            <string>$TexturePacker:SmartUpdate:3edb7c3d0c88cacfb4a0df8b6eef1160$</string>
+            <key>textureFileName</key>
+            <string>quan_huang_TX_1190.png</string>
+        </dict>
+    </dict>
+</plist>

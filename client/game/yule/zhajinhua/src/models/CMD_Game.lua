@@ -44,7 +44,7 @@ cmd.SUB_S_ANDROID_CARD			= 110
 cmd.SUB_S_CHEAT_CARD			= 111
 --更新密钥
 cmd.SUB_S_UPDATEAESKEY			= 120
---游戏币不足
+--金币不足
 cmd.SUB_S_RC_TREASURE_DEFICIENCY	= 121
 
 --***************客户端命令结构**************--

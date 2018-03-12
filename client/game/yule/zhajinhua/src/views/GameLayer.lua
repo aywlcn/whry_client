@@ -72,7 +72,7 @@ end
 --系统消息
 function GameLayer:onSystemMessage( wType,szString )
     if wType == 501 or wType == 515 then
-        print("扎金花游戏币不足消息", szString)
+        print("扎金花金币不足消息", szString)
         GlobalUserItem.bWaitQuit = true
         self:onSubNoticeAddScore(szString)
     end
@@ -127,7 +127,7 @@ function GameLayer:getParentNode( )
     return self._scene
 end
 --设置私有房的层级
-function GameLayer:addPrivateGameLayer( layer )
+function GameModel:addPrivateGameLayer( layer )
     if nil == layer then
         return
     end
@@ -158,7 +158,7 @@ function GameLayer:OnInitGameEngine()
 
     self.m_lAllTableScore = 0
 
-    self.m_bNoScore = false   --游戏币不足
+    self.m_bNoScore = false   --金币不足
     self.m_bStartGame = false
     -- 提示
     self.m_szScoreMsg = ""
@@ -309,6 +309,7 @@ function GameLayer:onEventGameScene(cbGameStatus,dataBuffer)
                 self:SetGameClock(self:GetMeChairID(),cmd.IDI_START_GAME,cmd.TIME_START_GAME)
             end   
         end
+
 	elseif cbGameStatus == cmd.GAME_STATUS_PLAY	then			--游戏状态
         print("game status is play!")
         local MyChair = self:GetMeChairID() + 1
@@ -459,7 +460,7 @@ function GameLayer:onEventGameMessage(sub,dataBuffer)
     elseif sub == cmd.SUB_S_UPDATEAESKEY then
         self:onSubUpdateAesKey(dataBuffer)
     elseif sub == cmd.SUB_S_RC_TREASURE_DEFICIENCY then
-       --self:onSubNoticeAddScore("你的游戏币不足，无法继续游戏")
+       --self:onSubNoticeAddScore("你的金币不足，无法继续游戏")
 	else
 		print("unknow gamemessage sub is"..sub)
 	end
@@ -872,7 +873,7 @@ function GameLayer:onSubNoticeAddScore(szString)
     self.m_bNoScore = true
 
     if self.m_bStartGame then
-        local msg = szString or "你的游戏币不足，无法继续游戏"
+        local msg = szString or "你的金币不足，无法继续游戏"
         self.m_querydialog = QueryDialog:create(msg,function()
             self:onExitTable()
         end,nil,1)

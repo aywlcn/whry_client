@@ -1,6 +1,0 @@
-[
-    {
-        "logtime": "2017/12/21 11:40:45",
-        "logdata": "[string \".\\client/src/plaza/views/layer/plaza/CardChar...\"]:129: attempt to call method 'getString' (a nil value)\nstack traceback:\n\t[string \".\\client/src/plaza/views/layer/plaza/CardChar...\"]:146: in function 'onButtonClickedEvent'\n\t[string \".\\client/src/plaza/views/layer/plaza/CardChar...\"]:63: in function <[string \".\\client/src/plaza/views/layer/plaza/CardChar...\"]:61>"
-    }
-]

@@ -649,7 +649,7 @@ function ClientScene:onCreate()
 	self:initListener()
 
 	--快速开始
-	self.m_bQuickStart = false	
+	self.m_bQuickStart = true	
 
 	--游戏喇叭列表
 	self.m_gameTrumpetList = {}
@@ -839,7 +839,7 @@ function ClientScene:onEnterRoom()
 	--如果是快速游戏
 	local entergame = self:getEnterGameInfo()
 	if self.m_bQuickStart and nil ~= entergame then
-		self.m_bQuickStart = false
+		self.m_bQuickStart = true
 		local t,c = yl.INVALID_TABLE,yl.INVALID_CHAIR
 		-- 找桌
 		local bGet = false
@@ -935,7 +935,7 @@ function ClientScene:onStartGame()
 		self.m_touchFilter = nil
 	end
 
-	self:showPopWait()
+	self:showPopWait(false,"正在加载...")
 	self._gameFrame:onInitData()
 	self._gameFrame:setKindInfo(GlobalUserItem.nCurGameKind, entergame._KindVersion)
 	local curScene = self._sceneRecord[#self._sceneRecord]
@@ -961,8 +961,9 @@ function ClientScene:onCleanPackage(name)
 end
 
 function ClientScene:onLevelCallBack(result,msg)
+    print("----------- onLevelCallBack",msg)
 	if type(msg) == "string" and "" ~= msg then
-		showToast(self, msg, 2)
+		--showToast(self, msg, 2)
 	end
 
 	self:dismissPopWait()
@@ -1037,6 +1038,8 @@ end
 
 --跑马灯更新
 function ClientScene:onChangeNotify(msg)
+    print("-------------------------------- onChangeNotify1:",msg and msg.str or "null")
+
 	self._notifyText:stopAllActions()
 	if not msg or not msg.str or #msg.str == 0 then
 		self._notifyText:setString("")
@@ -1047,9 +1050,11 @@ function ClientScene:onChangeNotify(msg)
 	end
 	self.m_bNotifyRunning = true
 	local msgcolor = msg.color or cc.c4b(255,191,123,255)
-	self._notifyText:setVisible(false)
+	--self._notifyText:setVisible(false)
 	self._notifyText:setString(msg.str)
 	self._notifyText:setTextColor(msgcolor)
+
+    print("-------------------------------- onChangeNotify2:",msg.str)
 
 	if true == msg.autoremove then
 		msg.showcount = msg.showcount or 0
@@ -1322,6 +1327,26 @@ function ClientScene:onChangeShowMode(nTag, param)
 			elseif tag ~= yl.SCENE_ROOM then --回退到房间桌子界面
 				self._sceneRecord[#self._sceneRecord+1] = yl.SCENE_ROOM
 				tag = yl.SCENE_ROOM
+
+
+                tag = yl.SCENE_ROOMLIST
+				local bHaveRoomList = false
+				local tmpRecord = { yl.SCENE_GAMELIST, yl.SCENE_ROOMLIST}
+--				for i = 1, #self._sceneRecord do
+--					if self._sceneRecord[i] ~= yl.SCENE_ROOM then
+--						table.insert(tmpRecord, self._sceneRecord[i])
+--					end
+
+--					if self._sceneRecord[i] == yl.SCENE_ROOMLIST then
+--						bHaveRoomList = true
+--					end
+--				end
+--				if false == bHaveRoomList then
+--					tmpRecord[#tmpRecord + 1] = yl.SCENE_ROOMLIST
+--				end
+				self._sceneRecord = tmpRecord
+
+
 			end
 
 			-- 任务查询
@@ -1653,7 +1678,26 @@ function ClientScene:getTagLayer(tag, param )
 	elseif tag == yl.SCENE_TASK then
 		dst = Task:create(self, self._gameFrame)
 	elseif tag == yl.SCENE_ROOM then
-		dst = Room:create(self._gameFrame,self, param)
+--		dst = Room:create(self._gameFrame,self, param)
+    --是否有自定义房间列表
+		    local entergame = self:getEnterGameInfo()
+		    if nil ~= entergame then
+			    local modulestr = string.gsub(entergame._KindName, "%.", "/")
+			    local targetPlatform = cc.Application:getInstance():getTargetPlatform()
+			    local customRoomFile = ""
+			    if cc.PLATFORM_OS_WINDOWS == targetPlatform then
+				    customRoomFile = "game/" .. modulestr .. "src/views/GameRoomListLayer.lua"
+			    else
+				    customRoomFile = "game/" .. modulestr .. "src/views/GameRoomListLayer.luac"
+			    end
+			    if cc.FileUtils:getInstance():isFileExist(customRoomFile) then
+				    dst = appdf.req(customRoomFile):create(self, self._gameFrame, param)
+			    end
+		    end
+		    if nil == dst then
+			    dst = RoomList:create(self, param)
+		    end		
+
 	elseif tag == yl.SCENE_GAME then
 		local entergame = self:getEnterGameInfo()
 		if nil ~= entergame then
@@ -1717,9 +1761,9 @@ function ClientScene:getTagLayer(tag, param )
 end
 
 --显示等待
-function ClientScene:showPopWait(isTransparent)
+function ClientScene:showPopWait(isTransparent , showStr)
 	if not self._popWait then
-		self._popWait = PopWait:create(isTransparent)
+		self._popWait = PopWait:create(isTransparent , showStr)
 			:show(self,"请稍候！")
 		self._popWait:setLocalZOrder(yl.MAX_INT)
 	end
@@ -2078,10 +2122,14 @@ end
 function ClientScene:requestNotice()
 	local url = yl.HTTP_URL .. "/WS/MobileInterface.ashx?action=GetMobileRollNotice"         	
 	appdf.onHttpJsionTable(url ,"GET","",function(jstable,jsdata)
+        print("------------------------------- requestNotice 1")
 		if type(jstable) == "table" then
 			local data = jstable["data"]
 			local msg = jstable["msg"]
+            print("------------------------------- requestNotice 2")
 			if type(data) == "table" then
+                print("------------------------------- requestNotice 3")
+                dump("---------------------------------requestNotice  3" , data)
 				local valid = data["valid"]
 				if nil ~= valid and true == valid then
 					local list = data["notice"]
@@ -2095,6 +2143,9 @@ function ClientScene:requestNotice()
 							item.color = cc.c4b(255,191,123,255)
 							item.autoremove = false
 							item.showcount = 0
+
+                            print("------------------------------- requestNotice 5")
+                            dump("---------------------------------requestNotice" , item)
 							table.insert(self.m_tabSystemNotice, item)
 						end
 						self:onChangeNotify(self.m_tabSystemNotice[self._sysIndex])
@@ -2218,7 +2269,7 @@ function ClientScene:queryUserScoreInfo(queryCallBack)
     self:showPopWait()
     appdf.onHttpJsionTable(url ,"GET","action=GetScoreInfo&userid=" .. GlobalUserItem.dwUserID .. "&time=".. ostime .. "&signature=".. GlobalUserItem:getSignature(ostime),function(sjstable,sjsdata)
         self:dismissPopWait()
-        dump(sjstable, "sjstable", 5)
+        --dump(sjstable, "sjstable", 5)
         if type(sjstable) == "table" then
             local data = sjstable["data"]
             if type(data) == "table" then

@@ -313,7 +313,7 @@ function LogonScene:onLogon(szAccount,szPassword,bSave,bAuto)
 	self._bSave = bSave
 
 	--调用登录
-	self:showPopWait()
+	self:showPopWait(false,"正在登陆服务器")
 	self._Operate = 0
 	self._logonFrame:onLogonByAccount(szAccount,szPassword)
 end
@@ -321,7 +321,7 @@ end
 --游客登录
 function LogonScene:onVisitor()
 	--调用登录
-	self:showPopWait()
+	self:showPopWait(false,"正在登陆服务器")
 	self._Operate = 2
 	self._logonFrame:onLogonByVisitor()
 end
@@ -329,7 +329,7 @@ end
 --微信登陆
 function LogonScene:thirdPartyLogin(plat)
 	self._tThirdData = {}
-	self:showPopWait()
+	self:showPopWait(false,"正在登陆服务器")
 	self:runAction(cc.Sequence:create(cc.DelayTime:create(5), cc.CallFunc:create(function()
 			self:dismissPopWait()
 		end)))
@@ -545,9 +545,9 @@ function LogonScene:onLogonCallBack(result,message)
 end
 
 --显示等待
-function LogonScene:showPopWait()
+function LogonScene:showPopWait(isTransparent , showStr)
 	if not self._popWait  then
-		self._popWait = PopWait:create()
+		self._popWait = PopWait:create(isTransparent , showStr)
 			:show(self._topLayer,"请稍候！")
 	end
 end
