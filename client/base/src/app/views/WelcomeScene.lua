@@ -83,9 +83,18 @@ function WelcomeScene:onCreate()
     -- add by wss
     self._txtTips:setVisible(false)
 
+    
+
+
 	self.m_progressLayer = display.newLayer(cc.c4b(0, 0, 0, 0))
 	self:addChild(self.m_progressLayer)
 	self.m_progressLayer:setVisible(false)
+
+    ------ 提示图片
+    self._tipSprite = cc.Sprite:create("tip_sprite.png")
+    self._tipSprite:setPosition(appdf.WIDTH/2, 180)
+    self.m_progressLayer:addChild(self._tipSprite)
+
 	--总进度
 	local total_bg = cc.Sprite:create("wait_frame_0.png")
 	self.m_spTotalBg = total_bg
@@ -102,20 +111,25 @@ function WelcomeScene:onCreate()
 		:move(self.m_totalBar:getContentSize().width * 0.5, self.m_totalBar:getContentSize().height * 0.5)
 		:addTo(self.m_totalBar)
 	self.m_totalThumb = cc.Sprite:create("thumb_1.png")
+
+    self.m_totalThumb:setVisible(false)
+
 	self.m_totalBar:addChild(self.m_totalThumb)
 	self.m_totalThumb:setPositionY(self.m_totalBar:getContentSize().height * 0.5)
 	self:updateBar(self.m_totalBar, self.m_totalThumb, 0)
 
 	--单文件进度
+    local file_height = 130
+
 	local file_bg = cc.Sprite:create("wait_frame_0.png")
 	self.m_spFileBg = file_bg
 	self.m_progressLayer:addChild(file_bg)
-	file_bg:setPosition(appdf.WIDTH/2, 120)
+	file_bg:setPosition(appdf.WIDTH/2, file_height)
 	self.m_fileBar = ccui.LoadingBar:create()
 	self.m_fileBar:loadTexture("wait_frame_2.png")
 	self.m_fileBar:setPercent(0)
 	self.m_progressLayer:addChild(self.m_fileBar)
-	self.m_fileBar:setPosition(appdf.WIDTH/2, 120)
+	self.m_fileBar:setPosition(appdf.WIDTH/2, file_height)
 	self._fileTips = cc.Label:createWithTTF("", "fonts/round_body.ttf", 20)
 		--:setTextColor(cc.c4b(0,250,0,255))
 		:setName("text_tip")
@@ -123,6 +137,9 @@ function WelcomeScene:onCreate()
 		:move(self.m_fileBar:getContentSize().width * 0.5, self.m_fileBar:getContentSize().height * 0.5)
 		:addTo(self.m_fileBar)
 	self.m_fileThumb = cc.Sprite:create("thumb_0.png")
+
+    self.m_fileThumb:setVisible(false)
+
 	self.m_fileBar:addChild(self.m_fileThumb)
 	self.m_fileThumb:setPositionY(self.m_fileBar:getContentSize().height * 0.5)
 	self:updateBar(self.m_fileBar, self.m_fileThumb, 0)
