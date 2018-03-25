@@ -26,7 +26,7 @@ menuBtnAnimationVec = {}
 
 function GameListLayer:ctor(gamelist)
 	print("============= 游戏列表界面创建 =============")
-    --dump(gamelist,"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--------- gameList -=-=-=-=--------------")
+    dump(gamelist,"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--------- gameList -=-=-=-=--------------")
 
 	self.m_bQuickStart = true
 
@@ -75,14 +75,15 @@ function GameListLayer:ctor(gamelist)
         [122] = 8,
         [123] = 9,
         [140] = 9,
+		[201] = 8,
         [502] = 9,
         [503] = 9,
         [508] = 10,
         [510] = 8,
         [511] = 10,
-        [516] = 9,
-        [519] = 8,
-        [600] = 9,
+		[516] = 9,
+		[600] = 9,
+        [3001] = 8,
     }
     -- 动画数组
     --self._menuBtnAnimationVec = {}
@@ -614,9 +615,9 @@ function GameListLayer.tableCellAtIndex(view, idx)
 
 	    else-----------------------------------------------------------------------------------------------
 		    game = cell:getChildByTag(1)
-            --dump(gameinfo,"-=-=-=-=-=-=-------------- gameinfo")
+            dump(gameinfo,"-=-=-=-=-=-=-------------- gameinfo")
             print("-=-=-=-=-=-=-=---------------- filestr",filestr)
-            --dump(gameinfo2,"-=-=-=-=-=-=-------------- gameinfo2")
+            dump(gameinfo2,"-=-=-=-=-=-=-------------- gameinfo2")
             print("-=-=-=-=-=-=-=---------------- filestr2",filestr2)
 
 		    game:loadTexture(filestr)
@@ -1098,7 +1099,7 @@ function GameListLayer:updateResult(result,msg)
 			end
 		end
 
-		-- self._txtTips:setString("OK")
+		self._txtTips:setString("OK")
 		self:onEnterGame(self._downgameinfo)
 	else
 		local runScene = cc.Director:getInstance():getRunningScene()

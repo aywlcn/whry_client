@@ -15,6 +15,7 @@ BankLayer.BT_SAVE 			= 3
 BankLayer.BT_TRANSFER		= 4
 BankLayer.CBT_SAVEORTAKE 	= 5
 BankLayer.CBT_TRANSFER 		= 6
+BankLayer.CBT_CHECK 		= 7
 BankLayer.EDIT_TRANSFER_DST = 9
 BankLayer.CBT_BY_ID			= 10
 BankLayer.CBT_BY_NAME		= 11
@@ -30,6 +31,12 @@ BankLayer.BT_BACK  			= 20
 BankLayer.BT_ENABLE_RETURN	= 30
 BankLayer.BT_ENABLE_BACK	= 31
 BankLayer.BT_ENABLE_CONFIRM = 32
+
+BankPanelType = {
+    takeSavePanel = "takeSavePanel",
+    giftPanel = "giftPanel",
+    giftRecordPanel = "giftRecordPanel",
+}
 
 function BankLayer:ctor(scene, gameFrame , isGiftScene)
 	ExternalFun.registerNodeEvent(self)
@@ -74,166 +81,269 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
 
 	local areaWidth = yl.WIDTH
 	local areaHeight = yl.HEIGHT
+    ---------------- add by wss  , show as  
+    local rootLayer, csbNode = ExternalFun.loadRootCSB("Bank/BankLayer.csb", self)
+
+    -- 当前的 显示界面 类型
+    self._nowShowPanelType = BankPanelType.takeSavePanel
+
+    ---- 三个 显示类型 面板
+    self._takeSavePanel = getChildFormObject(csbNode , "saveTakeCtxPanel") 
+    self._giftPanel = getChildFormObject(csbNode , "giftCtxPanel") 
+    self._giftRecordPanel = getChildFormObject(csbNode , "GiftRecordPanel") 
+
+    -- 三个显示类型面板的按钮
+    self._takeSavePanelBtn = getChildFormObject(csbNode , "saveTakeBtn") 
+    self._takeSavePanelBtn_selected = getChildFormObject(csbNode , "saveTakeBtn_selected") 
+
+    self._giftPanelBtn = getChildFormObject(csbNode , "giftBtn") 
+    self._giftPanelBtn_selected = getChildFormObject(csbNode , "giftBtn_selected") 
+
+    self._giftRecordBtn = getChildFormObject(csbNode , "giftRecordBtn") 
+    self._giftRecordBtn_selected = getChildFormObject(csbNode , "giftRecordBtn_selected") 
 
 	--显示标题
-    local frame = cc.SpriteFrameCache:getInstance():getSpriteFrame("sp_top_bg.png")
-    if nil ~= frame then
-        local sp = cc.Sprite:createWithSpriteFrame(frame)
-        sp:setPosition(areaWidth/2,700)
-        self:addChild(sp)
-    end
-	display.newSprite("Bank/title_bank.png")
-		:move(areaWidth/2,700)
-		:addTo(self)
+--    local frame = cc.SpriteFrameCache:getInstance():getSpriteFrame("sp_top_bg.png")
+--    if nil ~= frame then
+--        local sp = cc.Sprite:createWithSpriteFrame(frame)
+--        sp:setPosition(areaWidth/2,700)
+--        self:addChild(sp)
+--    end
+--	display.newSprite("Bank/title_bank.png")
+--		:move(areaWidth/2,700)
+--		:addTo(self)
 
 	--返回按钮
-	ccui.Button:create("bt_return_0.png","bt_return_1.png")
-    	:move(75,yl.HEIGHT-51)
-    	:setTag(BankLayer.BT_EXIT)
-    	:addTo(self)
-    	:addTouchEventListener(btcallback)
+    self._returnBtn = getChildFormObject(csbNode , "closeBtn") 
+    self._returnBtn:setTag(BankLayer.BT_EXIT)
+    self._returnBtn:addTouchEventListener(btcallback)
+
+--	ccui.Button:create("bt_return_0.png","bt_return_1.png")
+--    	:move(75,yl.HEIGHT-51)
+--    	:setTag(BankLayer.BT_EXIT)
+--    	:addTo(self)
+--    	:addTouchEventListener(btcallback)
 
     --背景框
-    frame = cc.SpriteFrameCache:getInstance():getSpriteFrame("sp_public_frame_0.png")
-    if nil ~= frame then
-        local sp = cc.Sprite:createWithSpriteFrame(frame)
-        sp:setPosition(areaWidth/2,325)
-        self:addChild(sp)
-    end
+--    frame = cc.SpriteFrameCache:getInstance():getSpriteFrame("sp_public_frame_0.png")
+--    if nil ~= frame then
+--        local sp = cc.Sprite:createWithSpriteFrame(frame)
+--        sp:setPosition(areaWidth/2,325)
+--        self:addChild(sp)
+--    end
 
-	self._cbtSaveTake = ccui.CheckBox:create("Bank/tag_bank_take_0.png","Bank/tag_bank_take_0.png","Bank/tag_bank_take_1.png","","")
-		:move(yl.WIDTH/2,585)
-		:setAnchorPoint(cc.p(1.0,0.5))
-		:setSelected(true)
-		:addTo(self)
-		:setTag(self.CBT_SAVEORTAKE)
-	self._cbtSaveTake:addEventListener(cbtlistener)
-    self._cbtSaveTake:setVisible(false)
-    self._cbtSaveTake:setEnabled(false)
+    -- 金币存取选项按钮
+    self._cbtSaveTake = getChildFormObject(csbNode , "saveTakeBtn") 
+    self._cbtSaveTake:setTag(self.CBT_SAVEORTAKE)
+    self._cbtSaveTake:addTouchEventListener(btcallback)
 
-	--银行赠送
-	self._cbtTransfer = ccui.CheckBox:create("Bank/tag_bank_present_0.png","Bank/tag_bank_present_0.png","Bank/tag_bank_present_1.png","","")
-		:setAnchorPoint(cc.p(0,0.5))
-		:move(yl.WIDTH/2,585)
-		:setSelected(false)
-		:addTo(self)
-		:setTag(self.CBT_TRANSFER)
-	self._cbtTransfer:addEventListener(cbtlistener)
-	self._cbtTransfer:setVisible(false)
-	self._cbtTransfer:setEnabled(false)
+--	self._cbtSaveTake = ccui.CheckBox:create("Bank/tag_bank_take_0.png","Bank/tag_bank_take_0.png","Bank/tag_bank_take_1.png","","")
+--		:move(yl.WIDTH/2,585)
+--		:setAnchorPoint(cc.p(1.0,0.5))
+--		:setSelected(true)
+--		:addTo(self)
+--		:setTag(self.CBT_SAVEORTAKE)
+--	self._cbtSaveTake:addEventListener(cbtlistener)
+--    self._cbtSaveTake:setVisible(false)
+--    self._cbtSaveTake:setEnabled(false)
 
-	--转换区域
-	self._takesaveArea = display.newLayer()
-		:setContentSize(1250,520)
-		:move(42,26)
-		:addTo(self)
+	--银行赠送选项按钮
+    self._cbtTransfer = getChildFormObject(csbNode , "giftBtn") 
+    self._cbtTransfer:setTag(self.CBT_TRANSFER)
+    self._cbtTransfer:addTouchEventListener(btcallback)
 
-	display.newSprite("Bank/bank_frame_0.png")
-		:move(1250/2,430)
-		:addTo(self._takesaveArea)
-	--携带金币
-	display.newSprite("Bank/icon_bank_take.png")
-		:move(300,425)
-		:addTo(self._takesaveArea)
-	display.newSprite("Bank/text_bank_gold.png")
-		:move(455,443)
-		:addTo(self._takesaveArea)
-	self._txtScore = cc.LabelAtlas:_create(string.formatNumberThousands(GlobalUserItem.lUserScore,true,"/"), "Bank/bank_num_1.png", 19, 24, string.byte("/")) 
-    		:move(380,396)
-    		:setAnchorPoint(cc.p(0,0.5))
-    		:addTo(self._takesaveArea)
+--	self._cbtTransfer = ccui.CheckBox:create("Bank/tag_bank_present_0.png","Bank/tag_bank_present_0.png","Bank/tag_bank_present_1.png","","")
+--		:setAnchorPoint(cc.p(0,0.5))
+--		:move(yl.WIDTH/2,585)
+--		:setSelected(false)
+--		:addTo(self)
+--		:setTag(self.CBT_TRANSFER)
+--	self._cbtTransfer:addEventListener(cbtlistener)
+--	self._cbtTransfer:setVisible(false)
+--	self._cbtTransfer:setEnabled(false)
 
-    --银行金币
-	display.newSprite("Bank/icon_bank_save.png")
-		:move(785,425)
-		:addTo(self._takesaveArea)
-	display.newSprite("Bank/text_bank_save.png")
-		:move(915,443)
-		:addTo(self._takesaveArea)
+    -- 赠送记录 选项按钮
+    self._cbtGiftRecord = getChildFormObject(csbNode , "giftRecordBtn") 
+    self._cbtGiftRecord:setTag(self.CBT_CHECK)
+    self._cbtGiftRecord:addTouchEventListener(btcallback)
 
-	self._txtInsure = cc.LabelAtlas:_create(string.formatNumberThousands(GlobalUserItem.lUserInsure,true,"/"), "Bank/bank_num_1.png", 19, 24, string.byte("/")) 
-    		:move(853,396)
-    		:setAnchorPoint(cc.p(0,0.5))
-    		:addTo(self._takesaveArea)
 
-    --其他功能
-    self._txtSaveTakeChs = cc.LabelAtlas:_create("", "Bank/bank_num_0.png", 30, 32, string.byte("0")) 
-    		:move(898,305)
-    		:setAnchorPoint(cc.p(0,0.5))
-    		:addTo(self._takesaveArea)
+--	--转换区域
+--	self._takesaveArea = display.newLayer()
+--		:setContentSize(1250,520)
+--		:move(42,26)
+--		:addTo(self)
+
+--	display.newSprite("Bank/bank_frame_0.png")
+--		:move(1250/2,430)
+--		:addTo(self._takesaveArea)
+--	--携带金币
+--	display.newSprite("Bank/icon_bank_take.png")
+--		:move(300,425)
+--		:addTo(self._takesaveArea)
+--	display.newSprite("Bank/text_bank_gold.png")
+--		:move(455,443)
+--		:addTo(self._takesaveArea)
+
+    -- 自己携带的金币数量
+    self._txtScore = getChildFormObject(csbNode , "myMoneyValue") 
+    self._txtScore:setString(string.formatNumberThousands(GlobalUserItem.lUserScore,true,","))
+
+--	self._txtScore = cc.LabelAtlas:_create(string.formatNumberThousands(GlobalUserItem.lUserScore,true,"/"), "Bank/bank_num_1.png", 19, 24, string.byte("/")) 
+--    		:move(380,396)
+--    		:setAnchorPoint(cc.p(0,0.5))
+--    		:addTo(self._takesaveArea)
+
+--    --银行金币
+--	display.newSprite("Bank/icon_bank_save.png")
+--		:move(785,425)
+--		:addTo(self._takesaveArea)
+--	display.newSprite("Bank/text_bank_save.png")
+--		:move(915,443)
+--		:addTo(self._takesaveArea)
+    
+    -- 银行中的金币数量
+    self._txtInsure = getChildFormObject(csbNode , "bankMoneyValue") 
+    self._txtInsure:setString(string.formatNumberThousands(GlobalUserItem.lUserInsure,true,","))
+
+--	self._txtInsure = cc.LabelAtlas:_create(string.formatNumberThousands(GlobalUserItem.lUserInsure,true,"/"), "Bank/bank_num_1.png", 19, 24, string.byte("/")) 
+--    		:move(853,396)
+--    		:setAnchorPoint(cc.p(0,0.5))
+--    		:addTo(self._takesaveArea)
+
+--    --其他功能
+--    self._txtSaveTakeChs = cc.LabelAtlas:_create("", "Bank/bank_num_0.png", 30, 32, string.byte("0")) 
+--    		:move(898,305)
+--    		:setAnchorPoint(cc.p(0,0.5))
+--    		:addTo(self._takesaveArea)
     --[[ccui.Button:create("Bank/bt_bank_forget.png","")
     	:move(958,210)
     	:setTag(BankLayer.BT_FORGET)
     	:addTo(self._takesaveArea)
     	:addTouchEventListener(btcallback)]]
-    ccui.Button:create("Bank/bt_bank_check.png","")
-    	:move(990,117)
-    	:setTag(BankLayer.BT_CHECK)
-    	:addTo(self._takesaveArea)
-    	:addTouchEventListener(btcallback)
+
+    -- 操作记录按钮
+--    ccui.Button:create("Bank/bt_bank_check.png","")
+--    	:move(990,117)
+--    	:setTag(BankLayer.BT_CHECK)
+--    	:addTo(self._takesaveArea)
+--    	:addTouchEventListener(btcallback)
+
+    local panelNode = getChildFormObject(csbNode , "saveTakeCtxPanel") 
     self._notifyText = cc.Label:createWithTTF("提示：存入游戏币免手续费，取出将扣除 的手续费。", "fonts/round_body.ttf", 24)
-								:addTo(self._takesaveArea)
+								:addTo(panelNode)
 								:setTextColor(cc.c4b(136,164,224,255))
 								:move(1250/2,38)
+                                :setVisible(false)
+
 
     --存款按钮
-	ccui.Button:create("Bank/bt_bank_save_0.png", "Bank/bt_bank_save_1.png")
-		:move(490,117)
-		:setTag(BankLayer.BT_SAVE)
-		:addTo(self._takesaveArea)
-        :addTouchEventListener(btcallback)
-    --取款按钮
-   	ccui.Button:create("Bank/bt_bank_take_0.png", "Bank/bt_bank_take_1.png")
-		:move(763,117)
-		:setTag(BankLayer.BT_TAKE)
-		:addTo(self._takesaveArea)
-        :addTouchEventListener(btcallback)
+    self._saveBtn = getChildFormObject(csbNode , "saveBtn") 
+    self._saveBtn:setTag(BankLayer.BT_SAVE)
+    self._saveBtn:addTouchEventListener(btcallback)
 
-    display.newSprite("Bank/text_bank_take.png")
-    	:move(305,305)
-    	:addTo(self._takesaveArea)
-    display.newSprite("Bank/text_bank_password.png")
-    	:move(305,210)
-    	:addTo(self._takesaveArea)
+--	ccui.Button:create("Bank/bt_bank_save_0.png", "Bank/bt_bank_save_1.png")
+--		:move(490,117)
+--		:setTag(BankLayer.BT_SAVE)
+--		:addTo(self._takesaveArea)
+--        :addTouchEventListener(btcallback)
+    
+    --取款按钮
+    self._saveBtn = getChildFormObject(csbNode , "takeBtn") 
+    self._saveBtn:setTag(BankLayer.BT_TAKE)
+    self._saveBtn:addTouchEventListener(btcallback)
+
+--   	ccui.Button:create("Bank/bt_bank_take_0.png", "Bank/bt_bank_take_1.png")
+--		:move(763,117)
+--		:setTag(BankLayer.BT_TAKE)
+--		:addTo(self._takesaveArea)
+--        :addTouchEventListener(btcallback)
+
+--    display.newSprite("Bank/text_bank_take.png")
+--    	:move(305,305)
+--    	:addTo(self._takesaveArea)
+--    display.newSprite("Bank/text_bank_password.png")
+--    	:move(305,210)
+--    	:addTo(self._takesaveArea)
         --:setVisible(false)
 
     --金额大写提示
-    self.m_textNumber = ClipText:createClipText(cc.size(350,24), "", "fonts/round_body.ttf", 24)
-    self:addChild(self.m_textNumber)
-    self.m_textNumber:setPosition(930,335)
-    self.m_textNumber:setAnchorPoint(cc.p(0,0.5))
+--    self.m_textNumber = ClipText:createClipText(cc.size(350,24), "", "fonts/round_body.ttf", 24)
+--    self:addChild(self.m_textNumber)
+--    self.m_textNumber:setPosition(930,335)
+--    self.m_textNumber:setAnchorPoint(cc.p(0,0.5))
+
+    --self.m_textNumber:setVisible(false)
+
+    self.m_textNumber = getChildFormObject(csbNode , "giftMoneyWord") 
 
 	--金额输入
-	self.edit_Score = ccui.EditBox:create(cc.size(492,69), ccui.Scale9Sprite:create("Bank/bank_frame_1.png"))
-		:move(635,305)
+    local edit_score_bg = getChildFormObject(csbNode , "saveTakeInputBg") 
+    local edit_score = getChildFormObject(csbNode , "saveTakeInput") 
+
+    self.edit_Score = ccui.EditBox:create( edit_score_bg:getContentSize() , ccui.Scale9Sprite:create("Bank/bank_bg3.png"))
+		:move(cc.p(edit_score_bg:getPosition()))
 		:setFontName("fonts/round_body.ttf")
 		:setPlaceholderFontName("fonts/round_body.ttf")
-		:setFontSize(24)
-		:setPlaceholderFontSize(24)
+		:setFontSize( edit_score:getFontSize() )
+		:setPlaceholderFontSize( edit_score:getFontSize() )
 		:setMaxLength(13)
 		:setFontColor(cc.c4b(255,255,255,255))
 		:setInputMode(cc.EDITBOX_INPUT_MODE_NUMERIC)
 		:setTag(BankLayer.EDIT_SAVEORTAKE)
 		:setPlaceHolder("请输入操作金额")
-		:addTo(self._takesaveArea)
+		:addTo(edit_score_bg:getParent() , 10)
 	self.edit_Score:registerScriptEditBoxHandler(editHanlder)
 
+--	self.edit_Score = ccui.EditBox:create(cc.size(492,69), ccui.Scale9Sprite:create("Bank/bank_frame_1.png"))
+--		:move(635,305)
+--		:setFontName("fonts/round_body.ttf")
+--		:setPlaceholderFontName("fonts/round_body.ttf")
+--		:setFontSize(24)
+--		:setPlaceholderFontSize(24)
+--		:setMaxLength(13)
+--		:setFontColor(cc.c4b(255,255,255,255))
+--		:setInputMode(cc.EDITBOX_INPUT_MODE_NUMERIC)
+--		:setTag(BankLayer.EDIT_SAVEORTAKE)
+--		:setPlaceHolder("请输入操作金额")
+--		:addTo(self._takesaveArea)
+--	self.edit_Score:registerScriptEditBoxHandler(editHanlder)
+
 	--密码输入	
-	self.edit_Password = ccui.EditBox:create(cc.size(492,69), ccui.Scale9Sprite:create("Bank/bank_frame_1.png"))
-		:move(635,210)
+    local edit_Password_bg = getChildFormObject(csbNode , "saveTakePassInputBg") 
+    local edit_Password = getChildFormObject(csbNode , "saveTakePassInput") 
+
+    self.edit_Password = ccui.EditBox:create( edit_Password_bg:getContentSize() , ccui.Scale9Sprite:create("Bank/bank_bg3.png"))
+		:move( cc.p(edit_Password_bg:getPosition()) )
 		:setFontName("fonts/round_body.ttf")
 		:setPlaceholderFontName("fonts/round_body.ttf")
-		:setFontSize(24)
-		:setPlaceholderFontSize(24)
+		:setFontSize( edit_Password:getFontSize() )
+		:setPlaceholderFontSize( edit_Password:getFontSize() )
 		:setMaxLength(32)
 		:setFontColor(cc.c4b(195,199,239,255))
 		:setInputFlag(cc.EDITBOX_INPUT_FLAG_PASSWORD)
 		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)
 		:setPlaceHolder("存款不需要密码")
-		:addTo(self._takesaveArea)
+		:addTo( edit_Password_bg:getParent() , 10 )
+
+
+--	self.edit_Password = ccui.EditBox:create(cc.size(492,69), ccui.Scale9Sprite:create("Bank/bank_frame_1.png"))
+--		:move(635,210)
+--		:setFontName("fonts/round_body.ttf")
+--		:setPlaceholderFontName("fonts/round_body.ttf")
+--		:setFontSize(24)
+--		:setPlaceholderFontSize(24)
+--		:setMaxLength(32)
+--		:setFontColor(cc.c4b(195,199,239,255))
+--		:setInputFlag(cc.EDITBOX_INPUT_FLAG_PASSWORD)
+--		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)
+--		:setPlaceHolder("存款不需要密码")
+--		:addTo(self._takesaveArea)
 
         -- add by wss
         --self.edit_Password:setVisible(false)
+
+
 
 
 	--赠送界面
@@ -254,51 +364,67 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
     	:addTo(self._transferArea)
         --:setVisible(false)
 
-   	ccui.Button:create("Bank/bt_bank_present_0.png", "Bank/bt_bank_present_1.png")
-		:move(625,117)
-		:setTag(BankLayer.BT_TRANSFER)
-		:addTo(self._transferArea)
-        :addTouchEventListener(btcallback)
+    -- 赠送按钮
+    self._giftBtn = getChildFormObject(csbNode , "giftMoneyBtn") 
+    self._giftBtn:setTag(BankLayer.BT_TRANSFER)
+    self._giftBtn:addTouchEventListener(btcallback)
+
+--   	ccui.Button:create("Bank/bt_bank_present_0.png", "Bank/bt_bank_present_1.png")
+--		:move(625,117)
+--		:setTag(BankLayer.BT_TRANSFER)
+--		:addTo(self._transferArea)
+--        :addTouchEventListener(btcallback)
 	
-	self.edit_TransferDst = ccui.EditBox:create(cc.size(492,69), ccui.Scale9Sprite:create("Bank/bank_frame_1.png"))
-		:move(625,425)
+    --- 赠送ID输入框
+    local edit_TransferDst_bg = getChildFormObject(csbNode , "giftIdInputBg")  
+    local edit_TransferDst = getChildFormObject(csbNode , "giftIdInput") 
+
+	self.edit_TransferDst = ccui.EditBox:create( edit_TransferDst_bg:getContentSize(), ccui.Scale9Sprite:create("Bank/bank_bg3.png"))
+		:move( cc.p(edit_TransferDst_bg:getPosition()) )
 		:setFontName("fonts/round_body.ttf")
 		:setPlaceholderFontName("fonts/round_body.ttf")
-		:setFontSize(24)
-		:setPlaceholderFontSize(24)
+		:setFontSize(edit_TransferDst:getFontSize())
+		:setPlaceholderFontSize(edit_TransferDst:getFontSize())
 		:setMaxLength(32)
 		:setFontColor(cc.c4b(195,199,239,255))
 		:setTag(BankLayer.EDIT_TRANSFER_DST)
 		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)
 		:setPlaceHolder("请输入赠送的ID")
-		:addTo(self._transferArea)
+		:addTo(edit_TransferDst_bg:getParent() , 10)
 
-	self.edit_TransferScore = ccui.EditBox:create(cc.size(492,69), ccui.Scale9Sprite:create("Bank/bank_frame_1.png"))
-		:move(625,335)
+    -- 赠送的金额数量
+    local edit_TransferScore_bg = getChildFormObject(csbNode , "giftNumInputBg") 
+    local edit_TransferScore = getChildFormObject(csbNode , "giftNumInput") 
+
+	self.edit_TransferScore = ccui.EditBox:create( edit_TransferScore_bg:getContentSize() , ccui.Scale9Sprite:create("Bank/bank_bg3.png"))
+		:move( cc.p(edit_TransferScore_bg:getPosition()) )
 		:setFontName("fonts/round_body.ttf")
 		:setPlaceholderFontName("fonts/round_body.ttf")
-		:setFontSize(24)
-		:setPlaceholderFontSize(24)
+		:setFontSize( edit_TransferScore:getFontSize() )
+		:setPlaceholderFontSize( edit_TransferScore:getFontSize() )
 		:setMaxLength(13)
 		:setFontColor(cc.c4b(255,255,255,255))
 		:setInputMode(cc.EDITBOX_INPUT_MODE_NUMERIC)
 		:setPlaceHolder("请输入操作金额")
-		:addTo(self._transferArea)
+		:addTo( edit_TransferScore_bg:getParent() , 10 )
 	self.edit_TransferScore:registerScriptEditBoxHandler(editHanlder)
 
 	--密码输入	
-	self.edit_TransferPassword = ccui.EditBox:create(cc.size(492,69), ccui.Scale9Sprite:create("Bank/bank_frame_1.png"))
-		:move(625,240)
+    local edit_TransferPassword_bg = getChildFormObject(csbNode , "giftBankPassInputBg") 
+    local edit_TransferPassword = getChildFormObject(csbNode , "giftBankPassInput") 
+
+	self.edit_TransferPassword = ccui.EditBox:create( edit_TransferPassword_bg:getContentSize() , ccui.Scale9Sprite:create("Bank/bank_bg3.png"))
+		:move( cc.p(edit_TransferPassword_bg:getPosition()) )
 		:setFontName("fonts/round_body.ttf")
 		:setPlaceholderFontName("fonts/round_body.ttf")
-		:setFontSize(24)
-		:setPlaceholderFontSize(24)
+		:setFontSize(edit_TransferPassword:getFontSize())
+		:setPlaceholderFontSize(edit_TransferPassword:getFontSize())
 		:setMaxLength(32)
 		:setInputFlag(cc.EDITBOX_INPUT_FLAG_PASSWORD)
 		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)
 		:setFontColor(cc.c4b(195,199,239,255))
 		:setPlaceHolder("请输入银行密码")
-		:addTo(self._transferArea)
+		:addTo( edit_TransferPassword_bg:getParent() , 10 )
 
         -- add by wss
         --self.edit_TransferPassword:setVisible(false)
@@ -313,15 +439,18 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
     	:setTag(BankLayer.BT_FORGET)
     	:addTo(self._transferArea)
     	:addTouchEventListener(btcallback)]]
-    ccui.Button:create("Bank/bt_bank_check.png","")
-    	:move(990,117)
-    	:setTag(BankLayer.BT_CHECK)
-    	:addTo(self._transferArea)
-    	:addTouchEventListener(btcallback)
+
+--    ccui.Button:create("Bank/bt_bank_check.png","")
+--    	:move(990,117)
+--    	:setTag(BankLayer.BT_CHECK)
+--    	:addTo(self._transferArea)
+--    	:addTouchEventListener(btcallback)
+
     self._notifyTextPresent = cc.Label:createWithTTF("提示：存入游戏币免手续费，取出将扣除 的手续费。", "fonts/round_body.ttf", 24)
 								:addTo(self._transferArea)
 								:setTextColor(cc.c4b(136,164,224,255))
 								:move(1250/2,38)
+                                :setVisible(false)
 
 	--提示区域
 	self._notifyLayer = ccui.Layout:create()
@@ -363,6 +492,31 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
     	:addTo(self._notifyLayer)
     	:addTouchEventListener(btcallback)
 
+    --------   操作记录 面板相关
+    self._giftRecordScrollPanel = getChildFormObject(csbNode , "recordScrollPanel") 
+
+    --无记录提示
+	self._nullTipLabel = cc.Label:createWithTTF("没有银行记录","fonts/round_body.ttf",32)
+			:move( 770 / 2 , 410/2 )
+			:setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER)
+			:setTextColor(cc.c4b(206,175,255,255))
+			:setAnchorPoint(cc.p(0.5,0.5))
+			-- :setVisible(false)
+			:addTo(self._giftRecordScrollPanel)
+
+	--记录列表
+	self._listView = cc.TableView:create(cc.size(770, 410))
+	self._listView:setDirection(cc.SCROLLVIEW_DIRECTION_VERTICAL)    
+	self._listView:setPosition(cc.p(0,0))
+	self._listView:setDelegate()
+	self._listView:addTo(self._giftRecordScrollPanel)
+	self._listView:setVerticalFillOrder(cc.TABLEVIEW_FILL_TOPDOWN)
+	self._listView:registerScriptHandler(self.cellSizeForTable, cc.TABLECELL_SIZE_FOR_INDEX)
+	self._listView:registerScriptHandler(self.tableCellAtIndex, cc.TABLECELL_SIZE_AT_INDEX)
+	self._listView:registerScriptHandler(self.numberOfCellsInTableView, cc.NUMBER_OF_CELLS_IN_TABLEVIEW)
+
+
+
     if 0 == GlobalUserItem.cbInsureEnabled then
         -- add by wss  不显示设置面板了，直接设置一个默认值
         --self:initEnableBankLayer()
@@ -373,46 +527,96 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
         
 	    self._bankFrame:onEnableBank(yl.DEFAULT_PASSWORD)
 
+        self:showPanel()
     end
+
+
+    self:showPanel()
+
+
+    self._bankRecordList = {}
 
     --dump(gameFrame,"-=--=-=--------------------- gameFrame")
 end
 
+---- 根据面板的类型来显示
+function BankLayer:showPanel()
+    if self._nowShowPanelType == BankPanelType.takeSavePanel then
+        self._takeSavePanel:setVisible(true)
+        self._giftPanel:setVisible(false)
+        self._giftRecordPanel:setVisible(false)
+
+        self._takeSavePanelBtn:setVisible(false)
+        self._takeSavePanelBtn_selected:setVisible(true)
+        self._giftPanelBtn:setVisible(true)
+        self._giftPanelBtn_selected:setVisible(false)
+        self._giftRecordBtn:setVisible(true)
+        self._giftRecordBtn_selected:setVisible(false)
+
+    elseif self._nowShowPanelType == BankPanelType.giftPanel then
+        self._takeSavePanel:setVisible(false)
+        self._giftPanel:setVisible(true)
+        self._giftRecordPanel:setVisible(false)
+
+        self._takeSavePanelBtn:setVisible(true)
+        self._takeSavePanelBtn_selected:setVisible(false)
+        self._giftPanelBtn:setVisible(false)
+        self._giftPanelBtn_selected:setVisible(true)
+        self._giftRecordBtn:setVisible(true)
+        self._giftRecordBtn_selected:setVisible(false)
+    elseif self._nowShowPanelType == BankPanelType.giftRecordPanel then
+        self._takeSavePanel:setVisible(false)
+        self._giftPanel:setVisible(false)
+        self._giftRecordPanel:setVisible(true)
+
+        self._takeSavePanelBtn:setVisible(true)
+        self._takeSavePanelBtn_selected:setVisible(false)
+        self._giftPanelBtn:setVisible(true)
+        self._giftPanelBtn_selected:setVisible(false)
+        self._giftRecordBtn:setVisible(false)
+        self._giftRecordBtn_selected:setVisible(true)
+    end
+end
+
 -- add by wss 
 function BankLayer:showBankLayer()
-    local transfermode = true
-	self._cbtTransfer:setSelected(transfermode)
-	self._cbtSaveTake:setSelected(not transfermode)
-	self._transferArea:setVisible(transfermode)
-	self._takesaveArea:setVisible(not transfermode)
+--    local transfermode = true
+--	self._cbtTransfer:setSelected(transfermode)
+--	self._cbtSaveTake:setSelected(not transfermode)
+--	self._transferArea:setVisible(transfermode)
+--	self._takesaveArea:setVisible(not transfermode)
 
-	self.edit_Score:setText("")
-	self.edit_TransferScore:setText("")
-	self.m_textNumber:setString("")
+--	self.edit_Score:setText("")
+--	self.edit_TransferScore:setText("")
+--	self.m_textNumber:setString("")
 
-    --手续费
-    local str = string.format("提示:存入游戏币免手续费,取出将扣除%d‰的手续费。", self.m_tabBankConfigInfo.wRevenueTake)
-	--调整位置
-	if transfermode then 
-		self.m_textNumber:setPosition(930, 365)
-        str = string.format("提示:普通玩家游戏币赠送需扣除%d‰的手续费。", self.m_tabBankConfigInfo.wRevenueTransfer)
-        if 0 ~= GlobalUserItem.cbMemberOrder then
-            local vipConfig = GlobalUserItem.MemberList[GlobalUserItem.cbMemberOrder]
-            str = str .. vipConfig._name .. "扣除" .. vipConfig._insure .. "‰手续费。"
-        end
+--    --手续费
+--    local str = string.format("提示:存入游戏币免手续费,取出将扣除%d‰的手续费。", self.m_tabBankConfigInfo.wRevenueTake)
+--	--调整位置
+--	if transfermode then 
+--		self.m_textNumber:setPosition(930, 365)
+--        str = string.format("提示:普通玩家游戏币赠送需扣除%d‰的手续费。", self.m_tabBankConfigInfo.wRevenueTransfer)
+--        if 0 ~= GlobalUserItem.cbMemberOrder then
+--            local vipConfig = GlobalUserItem.MemberList[GlobalUserItem.cbMemberOrder]
+--            str = str .. vipConfig._name .. "扣除" .. vipConfig._insure .. "‰手续费。"
+--        end
 
-        --self._notifyTextPresent:setString(str)
-        --add by wss
-        local str2 = string.format("提示:默认银行密码为:%s 如未更改请尽快更改" , yl.DEFAULT_PASSWORD)
-        self._notifyTextPresent:setString(str2)
-	else
-		self.m_textNumber:setPosition(930, 330)
-        --self._notifyText:setString(str)
+--        --self._notifyTextPresent:setString(str)
+--        --add by wss
+--        local str2 = string.format("提示:默认银行密码为:%s 如未更改请尽快更改" , yl.DEFAULT_PASSWORD)
+--        self._notifyTextPresent:setString(str2)
+--	else
+--		self.m_textNumber:setPosition(930, 330)
+--        --self._notifyText:setString(str)
 
-        --add by wss
-        local str2 = string.format("提示:默认银行密码为:%s 如未更改请尽快更改" , yl.DEFAULT_PASSWORD)
-        self._notifyText:setString(str2)
-	end        
+--        --add by wss
+--        local str2 = string.format("提示:默认银行密码为:%s 如未更改请尽快更改" , yl.DEFAULT_PASSWORD)
+--        self._notifyText:setString(str2)
+--	end        
+
+    self._nowShowPanelType = BankPanelType.giftPanel
+    self:showPanel()
+
 end
 
 function BankLayer:initEnableBankLayer()
@@ -527,9 +731,155 @@ function BankLayer:onButtonClickedEvent(tag,sender)
 	elseif tag == BankLayer.BT_ENABLE_CONFIRM then
 		self:onEnableBank()
 	elseif tag == BankLayer.BT_CHECK then
-		self:getParent():getParent():onChangeShowMode(yl.SCENE_BANKRECORD)
+		-- self:getParent():getParent():onChangeShowMode(yl.SCENE_BANKRECORD)
+
+    elseif tag == self.CBT_SAVEORTAKE then
+        self._nowShowPanelType = BankPanelType.takeSavePanel
+        self:showPanel()
+    elseif tag == self.CBT_TRANSFER then
+        self._nowShowPanelType = BankPanelType.giftPanel
+        self:showPanel()
+    elseif tag == self.CBT_CHECK then
+        -- self:getParent():getParent():onChangeShowMode(yl.SCENE_BANKRECORD)
+        self:getGiftRecordData()
+
+        self._nowShowPanelType = BankPanelType.giftRecordPanel
+        self:showPanel()
 	end
 end
+
+------- 
+--  获取操作数据记录
+function BankLayer:getGiftRecordData()
+    print("---------------------------------- getGiftRecordData")
+    self._bankRecordList = {}
+
+	self._scene:showPopWait()
+	local this = self
+	appdf.onHttpJsionTable(yl.HTTP_URL .. "/WS/MobileInterface.ashx","GET","action=getbankrecord&userid="..GlobalUserItem.dwUserID.."&signature="..GlobalUserItem:getSignature(os.time()).."&time="..os.time().."&number=20&page=1",function(jstable,jsdata)
+			this._scene:dismissPopWait()
+			if jstable then
+				local code = jstable["code"]
+				if tonumber(code) == 0 then
+					local datax = jstable["data"]
+					if datax then
+						local valid = datax["valid"]
+						if valid == true then
+							local listcount = datax["total"]
+							local list = datax["list"]
+							if type(list) == "table" then
+								for i=1,#list do
+									local item = {}
+						            item.tradeType = list[i]["TradeTypeDescription"]
+						            item.swapScore = tonumber(list[i]["SwapScore"])
+						            item.revenue = tonumber(list[i]["Revenue"])
+						            item.date = GlobalUserItem:getDateNumber(list[i]["CollectDate"])
+						            item.id = list[i]["TransferAccounts"]
+						            table.insert(self._bankRecordList,item)
+								end
+							end
+						end
+					end
+				end
+
+				this:onUpdateShow()
+			else
+				showToast(this,"抱歉，获取银行记录信息失败！",2,cc.c3b(250,0,0))
+			end
+		end)
+    return self
+end
+
+------ 
+
+---------------------------------------------------------------------
+
+function BankLayer:onUpdateShow()
+	print("BankRecordLayer:onUpdateShow")
+
+	if not self._bankRecordList then
+		print("self._nullTipLabel:setVisible(true)")
+		self._nullTipLabel:setVisible(true)
+	else
+		self._nullTipLabel:setVisible(false)
+	end
+
+	self._listView:reloadData()
+
+end
+
+--子视图大小
+function BankLayer.cellSizeForTable(view, idx)
+  	return 770 , 56
+end
+
+--子视图数目
+function BankLayer.numberOfCellsInTableView(view)
+	return #view:getParent():getParent():getParent():getParent():getParent()._bankRecordList
+end
+	
+--获取子视图
+function BankLayer.tableCellAtIndex(view, idx)		
+	local cell = view:dequeueCell()
+	
+	local item = view:getParent():getParent():getParent():getParent():getParent()._bankRecordList[idx+1]
+
+	local width = 770
+	local height= 56
+
+	if not cell then
+		cell = cc.TableViewCell:new()
+	else
+		cell:removeAllChildren()
+	end
+
+	display.newSprite("BankRecord/table_bankrecord_cell_"..(idx%2)..".png")
+		:move(width/2,height/2)
+		:addTo(cell)
+
+	--日期
+	local date = os.date("%Y/%m/%d %H:%M:%S", tonumber(item.date)/1000)
+	-- print(date)
+	-- print(""..tonumber(item.date))
+	cc.Label:createWithTTF(date,"fonts/round_body.ttf",22)
+		:move(118,height/2)
+		:setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER)
+		:setTextColor(cc.c4b(206,175,255,255))
+		:setAnchorPoint(cc.p(0.5,0.5))
+		:addTo(cell)
+
+	cc.Label:createWithTTF(item.tradeType,"fonts/round_body.ttf",22)
+		:move(300,height/2)
+		:setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER)
+		:setTextColor(cc.c4b(206,175,255,255))
+		:setAnchorPoint(cc.p(0.5,0.5))
+		:addTo(cell)
+
+	cc.Label:createWithTTF(string.formatNumberThousands(item.swapScore,true,","),"fonts/round_body.ttf",22)
+		:move(420,height/2)
+		:setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER)
+		:setTextColor(cc.c4b(206,175,255,255))
+		:setAnchorPoint(cc.p(0.5,0.5))
+		:addTo(cell)
+
+	cc.Label:createWithTTF(item.id,"fonts/round_body.ttf",22)
+		:move(560,height/2)
+		:setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER)
+		:setTextColor(cc.c4b(206,175,255,255))
+		:setAnchorPoint(cc.p(0.5,0.5))
+		:addTo(cell)
+
+	cc.Label:createWithTTF(string.formatNumberThousands(item.revenue,true,","),"fonts/round_body.ttf",22)
+		:move(690,height/2)
+		:setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER)
+		:setTextColor(cc.c4b(206,175,255,255))
+		:setAnchorPoint(cc.p(0.5,0.5))
+		:addTo(cell)
+
+	return cell
+end
+---------------------------------------------------------------------
+
 
 --输入框监听
 function BankLayer:onEditEvent(event,editbox)
@@ -589,15 +939,15 @@ function BankLayer:onSelectedEvent(sender,eventType)
             --self._notifyTextPresent:setString(str)
 
             --add by wss
-            local str2 = string.format("提示:默认银行密码为:%s 如未更改请尽快更改" , yl.DEFAULT_PASSWORD)
-            self._notifyTextPresent:setString(str2)
+            --local str2 = string.format("提示:默认银行密码为:%s 如未更改请尽快更改" , yl.DEFAULT_PASSWORD)
+            --self._notifyTextPresent:setString(str2)
 		else
 			self.m_textNumber:setPosition(930, 330)
             --self._notifyText:setString(str)
 
             --add by wss
-            local str2 = string.format("提示:默认银行密码为:%s 如未更改请尽快更改" , yl.DEFAULT_PASSWORD)
-            self._notifyText:setString(str2)
+            --local str2 = string.format("提示:默认银行密码为:%s 如未更改请尽快更改" , yl.DEFAULT_PASSWORD)
+            --self._notifyText:setString(str2)
 		end        
 	elseif tag == BankLayer.CBT_BY_ID or tag == BankLayer.CBT_BY_NAME then
 		local byID = (tag == BankLayer.CBT_BY_ID)
@@ -710,8 +1060,8 @@ function BankLayer:onTakeScoreByHttp()
             local newUserScore = GlobalUserItem.lUserScore
             local offset = newUserScore - nowUserScore
             GlobalUserItem.lUserInsure = nowInsure - offset
-            self._txtInsure:setString(string.formatNumberThousands(GlobalUserItem.lUserInsure,true,"/"))
-            self._txtScore:setString(string.formatNumberThousands(GlobalUserItem.lUserScore,true,"/"))
+            self._txtInsure:setString(string.formatNumberThousands(GlobalUserItem.lUserInsure,true,","))
+            self._txtScore:setString(string.formatNumberThousands(GlobalUserItem.lUserScore,true,","))
         end)
         self._scene:updateInfomation()
         
@@ -868,8 +1218,8 @@ function BankLayer:onBankCallBack(result,message)
     end
 
 	if result == 1 then
-		self._txtScore:setString(string.formatNumberThousands(GlobalUserItem.lUserScore,true,"/"))
-		self._txtInsure:setString(string.formatNumberThousands(GlobalUserItem.lUserInsure,true,"/"))
+		self._txtScore:setString(string.formatNumberThousands(GlobalUserItem.lUserScore,true,","))
+		self._txtInsure:setString(string.formatNumberThousands(GlobalUserItem.lUserInsure,true,","))
 		self.edit_TransferDst:setText("")
 		self.edit_TransferScore:setText("")
 		self.edit_TransferPassword:setText("")
@@ -877,7 +1227,7 @@ function BankLayer:onBankCallBack(result,message)
 		self.edit_Password:setText("")
 		self.m_textNumber:setString("")
 		--更新大厅
-		self:getParent():getParent()._gold:setString(string.formatNumberThousands(GlobalUserItem.lUserScore,true,"/"))
+		self:getParent():getParent()._gold:setString(string.formatNumberThousands(GlobalUserItem.lUserScore,true,","))
 
         if self._bankFrame._oprateCode == BankFrame.OP_SEND_SCORE then
             -- 转账凭证
@@ -894,15 +1244,15 @@ function BankLayer:onBankCallBack(result,message)
 
         self.m_tabBankConfigInfo = message
 		--取款收费比例
-		local str = string.format("提示:存入游戏币免手续费,取出将扣除%d‰的手续费。", message.wRevenueTake)
-        self._notifyText:setString(str)
+		-- local str = string.format("提示:存入游戏币免手续费,取出将扣除%d‰的手续费。", message.wRevenueTake)
+        -- self._notifyText:setString(str)
 
         --add by wss
-        local str2 = string.format("提示:默认银行密码为:%s 如未更改请尽快更改" , yl.DEFAULT_PASSWORD)
-        self._notifyText:setString(str2)
+        --local str2 = string.format("提示:默认银行密码为:%s 如未更改请尽快更改" , yl.DEFAULT_PASSWORD)
+        --self._notifyText:setString(str2)
 
-        self._txtInsure:setString(string.formatNumberThousands(GlobalUserItem.lUserInsure,true,"/"))
-        self._txtScore:setString(string.formatNumberThousands(GlobalUserItem.lUserScore,true,"/"))
+        self._txtInsure:setString(string.formatNumberThousands(GlobalUserItem.lUserInsure,true,","))
+        self._txtScore:setString(string.formatNumberThousands(GlobalUserItem.lUserScore,true,","))
 	end
 
 
@@ -910,6 +1260,9 @@ function BankLayer:onBankCallBack(result,message)
         print("-=--=-=--------------------- isGiftScene")
         self:showBankLayer()
     end
+
+    self:showPanel()
+
 end
 
 --显示等待
