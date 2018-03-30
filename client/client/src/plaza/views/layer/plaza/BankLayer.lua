@@ -1301,7 +1301,7 @@ function BankLayer:showCerLayer( tabData )
         return
     end
     -- 加载csb资源
-    local rootLayer, csbNode = ExternalFun.loadRootCSB("Bank/BankCerLayer.csb", self)
+    local rootLayer, csbNode = ExternalFun.loadRootCSB("BankCer/BankCerLayer.csb", self)
     local stamp = tabData.opTime or os.time()
 
     local hide = function()
