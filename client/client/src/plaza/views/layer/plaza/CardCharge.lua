@@ -136,7 +136,7 @@ function CardChargeLayer:ctor( scene )
     self._passwordInput = passwordInput
 
 
-    self._chargeNameInput:setText( GlobalUserItem.szNickName )
+    self._chargeNameInput:setText( GlobalUserItem.dwGameID )
     
     -- 充值按钮
     self._chargeBtn = getChildFormObject(csbNode , "chargeButton") 
