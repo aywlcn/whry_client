@@ -1389,7 +1389,8 @@ function BankLayer:showCerLayer( tabData )
     csbNode.m_imageBg = image_bg
 
     -- 赠送人昵称
-    local sendnick = ClipText:createClipText(cc.size(210, 30), GlobalUserItem.szAccount, nil, 30)
+    --local sendnick = ClipText:createClipText(cc.size(210, 30), GlobalUserItem.szAccount, nil, 30)
+    local sendnick = ClipText:createClipText(cc.size(210, 30), GlobalUserItem.szNickName, nil, 30)
     sendnick:setTextColor(cc.c3b(79, 212, 253))
     sendnick:setAnchorPoint(cc.p(0, 0.5))
     sendnick:setPosition(cc.p(260, 450))
