@@ -1123,6 +1123,11 @@ function ClientScene:onButtonClickedEvent(tag,ref)
 	if tag == ClientScene.BT_EXIT then
 		self:onKeyBack()		
 	elseif tag == ClientScene.BT_QUICKSTART then
+        showToast(self, "暂未开放!", 1)
+        if true then
+            return
+        end
+
 		if GlobalUserItem.isAngentAccount() then
 			return
 		end

@@ -84,6 +84,8 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
     ---------------- add by wss  , show as  
     local rootLayer, csbNode = ExternalFun.loadRootCSB("Bank/BankLayer.csb", self)
 
+    self._csbNode = csbNode
+
     -- 当前的 显示界面 类型
     self._nowShowPanelType = BankPanelType.takeSavePanel
 
@@ -391,6 +393,8 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
 		:setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)
 		:setPlaceHolder("请输入赠送的ID")
 		:addTo(edit_TransferDst_bg:getParent() , 10)
+    self.edit_TransferDst:setName("giftIdInput")
+	self.edit_TransferDst:registerScriptEditBoxHandler(editHanlder)
 
     -- 赠送的金额数量
     local edit_TransferScore_bg = getChildFormObject(csbNode , "giftNumInputBg") 
@@ -407,6 +411,7 @@ function BankLayer:ctor(scene, gameFrame , isGiftScene)
 		:setInputMode(cc.EDITBOX_INPUT_MODE_NUMERIC)
 		:setPlaceHolder("请输入操作金额")
 		:addTo( edit_TransferScore_bg:getParent() , 10 )
+    self.edit_TransferScore:setName("giftNumInput")
 	self.edit_TransferScore:registerScriptEditBoxHandler(editHanlder)
 
 	--密码输入	
@@ -883,8 +888,14 @@ end
 
 --输入框监听
 function BankLayer:onEditEvent(event,editbox)
+    
 	if event == "changed" then
-		local src = editbox:getText()
+		local editBoxName = editbox:getName()
+        if editBoxName == "giftIdInput" then
+            return
+        end
+
+        local src = editbox:getText()
 
 		local dst =  src --string.gsub(src,"([^0-9])","")		
 		--editbox:setText(dst)
@@ -896,6 +907,11 @@ function BankLayer:onEditEvent(event,editbox)
 			self.m_textNumber:setString("")
 		end
 	elseif event == "return" then
+        local editBoxName = editbox:getName()
+        if editBoxName == "giftIdInput" then
+            return
+        end
+
 		local src = editbox:getText()
 		local numstr = self.m_textNumber:getString()
 		if src ~= numstr then
@@ -907,7 +923,15 @@ function BankLayer:onEditEvent(event,editbox)
 				self.m_textNumber:setString("")
 			end
             editbox:setText(dst)
-		end	
+		end
+    elseif event == "ended" then
+        local src = editbox:getText()
+        print("------------------------ gift id editbox text : ",src)
+        local editBoxName = editbox:getName()
+        if editBoxName == "giftIdInput" then
+            self._bankFrame:getUserInfo(src)
+        end
+
 	end
 end
 
@@ -1232,6 +1256,12 @@ function BankLayer:onBankCallBack(result,message)
         if self._bankFrame._oprateCode == BankFrame.OP_SEND_SCORE then
             -- 转账凭证
             self:showCerLayer(self._bankFrame._tabTarget)
+
+        end
+
+        if self._oprateCode == BankFrame.OP_QUERY_USER then
+            
+            getChildFormObject(csbNode , "giftNickName"):setString( self._bankFrame._tabTarget.opTargetAcconts )
         end
 	end
 
@@ -1359,7 +1389,8 @@ function BankLayer:showCerLayer( tabData )
     csbNode.m_imageBg = image_bg
 
     -- 赠送人昵称
-    local sendnick = ClipText:createClipText(cc.size(210, 30), GlobalUserItem.szAccount, nil, 30)
+    --local sendnick = ClipText:createClipText(cc.size(210, 30), GlobalUserItem.szAccount, nil, 30)
+    local sendnick = ClipText:createClipText(cc.size(210, 30), GlobalUserItem.szNickName, nil, 30)
     sendnick:setTextColor(cc.c3b(79, 212, 253))
     sendnick:setAnchorPoint(cc.p(0, 0.5))
     sendnick:setPosition(cc.p(260, 450))

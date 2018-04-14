@@ -6,6 +6,10 @@ local ExternalFun = require(appdf.EXTERNAL_SRC .. "ExternalFun")
 
 function BankFrame:ctor(view,callbcak)
 	BankFrame.super.ctor(self,view,callbcak)
+
+    -- add by wss
+    self._isJustGetUserInfo = false
+
 end
 
 --银行刷新
@@ -121,18 +125,24 @@ function BankFrame:onGameSocketEvent(main,sub,pData)
 			self._tabTarget.opTargetAcconts = cmd_table.szAccounts
 			self._tabTarget.opTargetID = cmd_table.dwTargerUserID
 
-			local buffer = ExternalFun.create_netdata(game_cmd.CMD_GP_C_TransferScoreRequest)
-			buffer:setcmdinfo(game_cmd.MDM_GR_INSURE,game_cmd.SUB_GR_TRANSFER_SCORE_REQUEST)
-			buffer:pushbyte(game_cmd.SUB_GR_TRANSFER_SCORE_REQUEST)
-			buffer:pushscore(self._lOperateScore)		
-			buffer:pushstring(cmd_table.szAccounts,yl.LEN_ACCOUNTS)
-			buffer:pushstring(md5(self._szPassword),yl.LEN_PASSWORD)
-			buffer:pushstring("",yl.LEN_TRANS_REMARK)
-			self._oprateCode = BankFrame.OP_SEND_SCORE
+            if not self._isJustGetUserInfo then
+			    local buffer = ExternalFun.create_netdata(game_cmd.CMD_GP_C_TransferScoreRequest)
+			    buffer:setcmdinfo(game_cmd.MDM_GR_INSURE,game_cmd.SUB_GR_TRANSFER_SCORE_REQUEST)
+			    buffer:pushbyte(game_cmd.SUB_GR_TRANSFER_SCORE_REQUEST)
+			    buffer:pushscore(self._lOperateScore)		
+			    buffer:pushstring(cmd_table.szAccounts,yl.LEN_ACCOUNTS)
+			    buffer:pushstring(md5(self._szPassword),yl.LEN_PASSWORD)
+			    buffer:pushstring("",yl.LEN_TRANS_REMARK)
+			    self._oprateCode = BankFrame.OP_SEND_SCORE
 
-			if not self._gameFrame:sendSocketData(buffer) then
-				self._callBack(-1,"发送转账失败！")
-			end
+			    if not self._gameFrame:sendSocketData(buffer) then
+				    self._callBack(-1,"发送转账失败！")
+			    end
+
+            else
+                getChildFormObject( self._viewFrame._csbNode , "giftNickName"):setString( self._tabTarget.opTargetAcconts ) 
+                self:onCloseSocket()
+            end
 		elseif sub == game_cmd.SUB_GR_USER_INSURE_ENABLE_RESULT then 	--开通结果
 			local cmd_table = ExternalFun.read_netdata(game_cmd.CMD_GR_S_UserInsureEnableResult, pData)
 			dump(cmd_table, "CMD_GR_S_UserInsureEnableResult", 6)
@@ -197,8 +207,14 @@ function BankFrame:onUserInfoResult(pData)
 	self._tabTarget.opTargetAcconts = cmdtable.szAccounts
 	self._tabTarget.opTargetID = cmdtable.dwTargetGameID
 
-	self._oprateCode = BankFrame.OP_SEND_SCORE
-	self:sendTransferScore()
+    if not self._isJustGetUserInfo then
+        print("---------------------------------- try transfer score")
+	    self._oprateCode = BankFrame.OP_SEND_SCORE
+	    self:sendTransferScore()
+    else
+        getChildFormObject( self._viewFrame._csbNode , "giftNickName"):setString( self._tabTarget.opTargetAcconts ) 
+        self:onCloseSocket()
+    end
 end
 
 --开通
@@ -296,9 +312,49 @@ function BankFrame:sendQueryUserInfo( )
 	cmd:pushbyte(0)
 	cmd:pushstring(self._target, 32)
 
+    dump(self._target , "-------------------- sendQueryUserInfo")
+
 	if not self:sendSocketData(cmd) and nil ~= self._callBack then
 		self._callBack(-1,"发送查询失败！")
 	end
+end
+
+
+-- add by wss 找到一个ID用户的信息
+function BankFrame:getUserInfo(userId)
+    self._isJustGetUserInfo = true
+
+    self._oprateCode = BankFrame.OP_QUERY_USER
+
+    self._tabTarget = {}
+	self._tabTarget.opTime = os.time()
+	self._tabTarget.opScore = 0
+	self._tabTarget.opTargetID = userId
+
+    --参数记录
+	self._lOperateScore = 0
+	self._target = userId
+	--self._byID	= byID
+	--self._szPassword = szPassword
+    
+    
+
+    if nil ~= self._gameFrame and self._gameFrame:isSocketServer() then
+		local buffer = ExternalFun.create_netdata(game_cmd.CMD_GR_C_QueryUserInfoRequest)
+		buffer:setcmdinfo(game_cmd.MDM_GR_INSURE,game_cmd.SUB_GR_QUERY_USER_INFO_REQUEST)
+		buffer:pushbyte(game_cmd.SUB_GR_QUERY_USER_INFO_REQUEST)
+		buffer:pushbyte(0)
+		buffer:pushstring(self._target, yl.LEN_ACCOUNTS)
+		if not self._gameFrame:sendSocketData(buffer) then
+			self._callBack(-1,"发送转账失败！")
+		end
+	else		
+		if not self:onCreateSocket(yl.LOGONSERVER,yl.LOGONPORT) and nil ~= self._callBack then
+			self._callBack(-1,"建立连接失败！")
+		end
+	end	
+
+    
 end
 
 function BankFrame:onFlushBank()
@@ -358,6 +414,8 @@ function BankFrame:onTakeScore(lScore,szPassword)
 end
 
 function BankFrame:onTransferScore(lScore,target,szPassword,byID)
+    self._isJustGetUserInfo = false
+
 	self._tabTarget = {}
 	self._tabTarget.opTime = os.time()
 	self._tabTarget.opScore = lScore
